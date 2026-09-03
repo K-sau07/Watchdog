@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: watchdog-api
+  profiles:
+    default: dev
+
+server:
+  port: 8080
+
+# Flyway is wired but dormant in S0 — no migrations exist yet.
+# It activates for real in S2 when the first migration lands.
