@@ -1,0 +1,36 @@
+# ── Java / Spring / Maven ──
+target/
+*.class
+*.jar
+*.war
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/timing.properties
+
+# ── Node / React / Vite ──
+node_modules/
+dist/
+dist-ssr/
+*.local
+.vite/
+
+# ── Env & secrets (NEVER commit) ──
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ── IDE / OS ──
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# ── Logs / tmp ──
+*.log
+/tmp/
+logs/
+
+# ── Docker volumes (local data) ──
+pgdata/
