@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+/*
+ * S0: minimal base only. The cyber "robot-era" design system —
+ * tokens, fonts, radar palette — lands in S8 after the UI bible (doc 02),
+ * per D-WD4. Nothing decorative here on purpose.
+ */
+:root {
+  color-scheme: light dark;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}

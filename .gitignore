@@ -34,3 +34,4 @@ logs/
 
 # ── Docker volumes (local data) ──
 pgdata/
+redisdata/
