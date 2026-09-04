@@ -1,0 +1,36 @@
+# Watchdog local infra — Postgres + Redis.
+# Dev-only convenience stack. Credentials come from .env (gitignored);
+# see .env.example for the shape. Never commit a real .env.
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: watchdog-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-watchdog}
+      POSTGRES_USER: ${DB_USER:-watchdog}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-watchdog}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      # Must mount at /data (not the parent) or data won't persist on recreate.
+      - ./pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-watchdog} -d ${DB_NAME:-watchdog}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: watchdog-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - ./redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
