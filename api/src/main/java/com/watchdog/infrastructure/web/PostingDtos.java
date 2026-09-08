@@ -23,6 +23,7 @@ final class PostingDtos {
     record PostingSummary(
             String id,
             String title,
+            String companyName,     // owning company's display name, null if unknown
             String location,
             String remoteType,
             String employmentType,
@@ -67,6 +68,7 @@ final class PostingDtos {
         return new PostingSummary(
                 p.id().value().toString(),
                 p.title(),
+                m.companyName(),
                 p.location(),
                 p.remoteType().name(),
                 p.employmentType().name(),

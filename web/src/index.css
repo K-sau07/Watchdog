@@ -59,6 +59,17 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Visible keyboard focus everywhere (a11y floor, constitution §7) — amber ring on
+ * keyboard focus only, never on mouse click. Applies to buttons, inputs, links. */
+:focus-visible {
+  outline: 2px solid var(--color-amber);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
 /* The one orchestrated motion moment (bible §6): a fresh arrival pulses hot->steady once. */
 @keyframes fresh-pulse {
   0% { box-shadow: 0 0 0 0 var(--amber-glow-hot); }

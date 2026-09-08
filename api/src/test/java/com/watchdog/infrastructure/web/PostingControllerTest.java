@@ -47,7 +47,7 @@ class PostingControllerTest {
                 EmploymentType.FULL_TIME, Salary.of(new BigDecimal("120000"), new BigDecimal("150000"), "USD"),
                 "https://x/y", "Great role. Visa sponsorship available.",
                 SponsorshipSignal.OFFERED, NOW.minus(Duration.ofMinutes(4)), NOW, null);
-        return new MatchingService.MatchedPosting(p, Seniority.NEW_GRAD, AtsSource.GREENHOUSE);
+        return new MatchingService.MatchedPosting(p, Seniority.NEW_GRAD, AtsSource.GREENHOUSE, "Ramp");
     }
 
     @Test
@@ -60,6 +60,7 @@ class PostingControllerTest {
                 .andExpect(jsonPath("$.totalMatched").value(1))
                 .andExpect(jsonPath("$.totalPages").value(1))
                 .andExpect(jsonPath("$.items[0].title").value("Software Engineer, New Grad"))
+                .andExpect(jsonPath("$.items[0].companyName").value("Ramp"))
                 .andExpect(jsonPath("$.items[0].seniority").value("NEW_GRAD"))
                 .andExpect(jsonPath("$.items[0].sponsorshipSignal").value("OFFERED"))
                 .andExpect(jsonPath("$.items[0].source").value("GREENHOUSE"))

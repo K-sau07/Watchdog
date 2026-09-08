@@ -11,7 +11,7 @@ Living state document. **Read this + the spec at the start of every session.** A
 - **Stack:** Java 21 / Spring Boot (hexagonal) · React 19 / Vite / TS / Tailwind · Postgres + Flyway · Redis · Testcontainers · Docker Compose · GitHub Actions.
 - **Spec:** `docs/01_WATCHDOG_SPEC.md` (APPROVED, immutable base). **Process:** `docs/00_DEVELOPMENT_CONSTITUTION.md`.
 
-## Locked decisions (D-WD1..D-WD11)
+## Locked decisions (D-WD1..D-WD12)
 - **D-WD1** — seed registry, **500 companies**; auto-grow later.
 - **D-WD2** — **2-min** poll; staggered across the window + backoff on 429; tune empirically.
 - **D-WD3** — all three ATS in v1 (Greenhouse → Lever → Ashby, built one at a time).
@@ -23,6 +23,8 @@ Living state document. **Read this + the spec at the start of every session.** A
 - **D-WD9** — heuristic parsers (seniority/sponsorship/salary) = **keyword/regex lists** in v1 (spec §5 + constitution §10 measure-first), over scoring or a classifier. Pure/stateless domain logic; honest UNKNOWN/empty when no rule fires. Seniority: title-first, most-senior-then-most-specific precedence, body fallback for early-career only. Sponsorship: body-first, NOT_OFFERED wins on conflict. Salary: fallback only when ATS gave no structured comp, accepts a figure only with a money signal ($/k/currency) at plausible magnitude (≥10k). Smarter classifier is a Phase-2 lever if measurement warrants.
 - **D-WD10** — dashboard read side = **fetch-then-filter in memory** for v1 (over SQL push-down or a hybrid). Bounded newest-first candidate window (`findRecent`, cap 2000), filter+enrich+paginate in memory so ALL matching stays in the tested `PostingMatcher`+parsers and pagination happens strictly after filtering. Correct + simplest at v1 volume (25 companies); outgrowing the cap is the measured trigger to push cheap cuts to SQL (Phase 2, references this decision).
 - **D-WD11** — seed the single v1 user (`SingleUser.ID`) via **Flyway migration V2** (`INSERT ... ON CONFLICT DO NOTHING`), over an ApplicationRunner. The sole-user id is a schema fact (D-WD5), so it belongs in a migration — runs in prod + Testcontainers automatically, idempotent, no runtime code, harmless once real auth arrives. Also: filter-profile `GET` **auto-provisions** a default on first read (no 404 dance) — the home for the owner's 2-YoE hunt default.
+- **D-WD12** — agent-status (`GET /api/agent/status`) is **DB-derived**, over an in-memory last-cycle holder. Boards + per-source from `findActive`; last poll = `max(last_polled_at)`; next = last + interval (config arithmetic); new-today + median-catch-time-today from postings first-seen since start of day. Honest, stateless, survives restart; median reuses the empty-when-unknown rule (§8.4).
+- **D-WD4 (resolved in bible `02`, approved):** UI system — **G-UI0** accent = signal amber (two temps) over neon-green/cyan (the command-console template cliché); **G-UI1** humanist-technical type (Space Grotesk / Inter / JetBrains Mono data-only / one Fraunces touch) over the Orbitron sci-fi default; **G-UI2** ~90/10 calm-to-amber; **G-UI3** radar = the live feed concept, not a skeuomorphic dial; **G-UI4** dark-first, no light mode.
 
 ## Build order & status
 - [x] **S0** — project scaffold (Spring + React + Postgres + Redis + Docker + CI; gauntlet green on empty) ✅
@@ -33,7 +35,7 @@ Living state document. **Read this + the spec at the start of every session.** A
 - [x] **S5** — company registry (500-company seed) + DiscoveryService ✅ (machinery done; seed = 25 verified, grows to 500)
 - [x] **S6** — matching/filters (all §5 dims, title+description) + salary/seniority/sponsorship parsers (pure logic, tested) ✅
 - [x] **S7** — job-state workflow (save/applied/hide) + filter-profile CRUD (single-user, no-auth) ✅
-- [ ] **S8** — dashboard: UI bible (`02`) first, then cyber feed + filter panel + agent-status bar + "caught N min after posting" stat + card state actions
+- [x] **S8** — dashboard: UI bible (`02`) first, then cyber feed + filter panel + agent-status bar + "caught N min after posting" stat + card state actions ✅
 - [ ] **S9** — end-to-end verify (real ATS → dashboard within poll window; filters + states) + full gauntlet
 - **Phase 2+** — notifications (email/Telegram), native-Mac menubar notifier, registry auto-expansion, smarter title/visa classifier, multi-user auth + UI
 
@@ -137,6 +139,23 @@ Branch `s7-workflow`, granular green commits, merged to `main --no-ff`. The dail
 - **Deferred:** real JWT auth (Phase 2 — schema already carries `user_id`); job-state filtering in the feed already shipped in S6.4 (read side), so S7 was purely the write side + profiles as planned.
 - **Next:** S8 — the dashboard. Per D-WD4: write `02_WATCHDOG_UI_BIBLE.md` FIRST (research-grounded, bold cyber/robot-era, options presented), then the cyber feed + exhaustive filter panel + agent-status bar + "caught N min after posting" signature stat + card state actions (Save/Applied/Hide wired to `PUT /api/postings/{id}/state`).
 
+### 2026 — Session 9: S8 dashboard (COMPLETE)
+Branch `s8-dashboard`, granular green commits, merged to `main --no-ff`. The cyber dashboard is built and **live-verified against the real backend** (booted on 8090, React via Vite proxy → real feed with parsed heuristics + company names + agent status). Backend: **196 Java tests**; frontend: **48 TS tests** (Vitest); both full gauntlets green.
+- **S8.0** `aa17f1c` — `02_WATCHDOG_UI_BIBLE.md` approved (D-WD4 gate). Research-grounded (2026 command-console + type landscape); locked G-UI0..4 + an anti-cliché ledger.
+- **S8.1** `2bba774` — `GET /api/agent/status` (DB-derived, D-WD12) — the last §7 endpoint. `AgentStatusService` + `findSeenSince`. 9 tests.
+- **S8.2** `6824198` — Tailwind v4 @theme tokens + fonts (bible §2/§3) + `freshness.ts` (pure ramp/label logic, 7 tests) + Vite dev proxy.
+- **S8.3** `2cfc9aa` — typed API client (`lib/api.ts`, mirrors §7 DTOs) + `lib/filters.ts` (FilterState→query, 6 tests) + TanStack Query. (erasableSyntaxOnly caught a param-property.)
+- **S8.4a** `979e6f0` — backend: expose `companyName` on the feed (a card needs it; already loadable). **S8.4** `8cffe07` — `JobCard` + `cardFormat.ts` (bible §5): freshness dot/glow/stamp, badges, state actions. 14 tests. Amber-on-charcoal verified visually before commit.
+- **S8.5** `d67030c` — `FeedList` + TanStack hooks: live feed (30s refetch), optimistic hide/state mutation, error/loading/empty states (bible §7 copy). 5 tests.
+- **S8.6** `0f956cb` — `AgentStatusBar` + `statusFormat.ts` (ago/countdown/median, 8 tests): live heartbeat, poll timing, degrades honestly.
+- **S8.7** `09944e8` — `FilterRail`: every §5 dimension (tag inputs + chip groups + single-select + salary), active count + reset. 5 tests.
+- **S8.8** `66fc6d8` — `App` shell: three zones wired, filter state, freshIds arrival pulse, HeroStat (median big-number + Fraunces line). Fixed a real exhaustive-deps warning honestly (no suppression).
+- **S8.9** `67c7fe4` — polish: mobile filter drawer (bible §4 collapsible), global `:focus-visible` amber ring (a11y floor). 48 tests.
+- **S8.10** — full gauntlets green, BUILD_LOG + D-WD12 + D-WD4-resolution, merged to `main`.
+- **Decisions:** **D-WD12** = DB-derived agent status. **D-WD4** resolved in bible `02` (G-UI0 amber / G-UI1 humanist-technical / G-UI2 90-10 / G-UI3 radar-as-feed / G-UI4 dark-first).
+- **⚠ Cold-start note (for S9):** `caughtMinutes` = `firstSeenAt − postedAt`. On a board's FIRST-EVER poll, every posting looks "caught months late" (ATS posted them long before we started watching) — median-catch-today reads huge and the freshness ramp shows everything cooled. This is **honest, not a bug**: the signature stat only becomes meaningful once the agent is already watching a board and a genuinely-new posting drops. S9 must verify catch-time on a posting that appears *after* polling starts, not on the cold backfill.
+- **Next:** S9 — end-to-end verify: prove a genuinely-new posting surfaces on the dashboard within the poll window with an honest small catch-time; exercise filters + job-state live; final full gauntlet (BE + FE + CI).
+
 ---
 
 ## Environment gotchas (append as discovered)
@@ -150,3 +169,8 @@ Branch `s7-workflow`, granular green commits, merged to `main --no-ff`. The dail
 - **RestClient bean gotcha:** an injected `RestClient.Builder` bean isn't always present in test contexts. Build `RestClient.builder()...build()` inside the component instead of depending on the bean. Test RestClient with OkHttp MockWebServer (real localhost HTTP). Run `mvn clean verify` before commit — isolated `-Dtest=` runs can hide context-load failures.
 - **Testcontainers 2.x renamed modules:** `testcontainers-junit-jupiter` / `testcontainers-postgresql` (old `junit-jupiter` / `postgresql` artifact IDs gone). BOM import needs explicit version in dependencyManagement.
 - **Frontend toolchain (current create-vite):** ships Vite 8 / React 19.2 / TS 6, and **oxlint** as the default linter (not ESLint). Tailwind v4 is CSS-first: no `tailwind.config.js`, no PostCSS config.
+- **TS 6 `erasableSyntaxOnly` (Vite default):** forbids runtime-emitting TS syntax — no constructor parameter-properties (`constructor(public readonly x)`), no `enum`, no `namespace`. Declare class fields explicitly. Typecheck catches it; the build (`tsc -b`) blocks on it.
+- **oxlint DOES run react-hooks/exhaustive-deps** (and reports it as a *warning*, easy to miss in a tail). An `// eslint-disable` comment does NOT suppress it. Fix the deps honestly (e.g. depend on the stable query object, derive inside the effect). Constitution §8: triage warnings, don't ignore.
+- **Boot 4 / Jackson 3 omits null fields by default** — `jsonPath("$.x").doesNotExist()` passes for a null-valued record field (no `include-non-null` config needed).
+- **Frontend gauntlet = 4 gates** (constitution §8): `npm run typecheck` + `npm run lint` (0/0) + `npm test` + `npm run build`. Run all four before every FE commit. Dev API proxy: Vite `server.proxy` `/api` → `localhost:8090`.
+- **Cold-start catch-time:** `caughtMinutes = firstSeenAt − postedAt`; on a board's first-ever poll this is huge (ATS posted the roles months before we watched). Honest, not a bug — the signature stat is only meaningful for postings that appear *after* polling starts.
