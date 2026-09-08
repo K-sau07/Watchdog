@@ -36,7 +36,7 @@ Living state document. **Read this + the spec at the start of every session.** A
 - [x] **S6** — matching/filters (all §5 dims, title+description) + salary/seniority/sponsorship parsers (pure logic, tested) ✅
 - [x] **S7** — job-state workflow (save/applied/hide) + filter-profile CRUD (single-user, no-auth) ✅
 - [x] **S8** — dashboard: UI bible (`02`) first, then cyber feed + filter panel + agent-status bar + "caught N min after posting" stat + card state actions ✅
-- [ ] **S9** — end-to-end verify (real ATS → dashboard within poll window; filters + states) + full gauntlet
+- [x] **S9** — end-to-end verify (real ATS → dashboard within poll window; filters + states) + full gauntlet ✅
 - **Phase 2+** — notifications (email/Telegram), native-Mac menubar notifier, registry auto-expansion, smarter title/visa classifier, multi-user auth + UI
 
 ## Session log
@@ -155,6 +155,19 @@ Branch `s8-dashboard`, granular green commits, merged to `main --no-ff`. The cyb
 - **Decisions:** **D-WD12** = DB-derived agent status. **D-WD4** resolved in bible `02` (G-UI0 amber / G-UI1 humanist-technical / G-UI2 90-10 / G-UI3 radar-as-feed / G-UI4 dark-first).
 - **⚠ Cold-start note (for S9):** `caughtMinutes` = `firstSeenAt − postedAt`. On a board's FIRST-EVER poll, every posting looks "caught months late" (ATS posted them long before we started watching) — median-catch-today reads huge and the freshness ramp shows everything cooled. This is **honest, not a bug**: the signature stat only becomes meaningful once the agent is already watching a board and a genuinely-new posting drops. S9 must verify catch-time on a posting that appears *after* polling starts, not on the cold backfill.
 - **Next:** S9 — end-to-end verify: prove a genuinely-new posting surfaces on the dashboard within the poll window with an honest small catch-time; exercise filters + job-state live; final full gauntlet (BE + FE + CI).
+
+### 2026 — Session 10: S9 end-to-end verify (COMPLETE) — v1 DONE
+Branch `s9-verify`, merged to `main --no-ff`. Booted the full stack (backend on 8090, Vite on 5173 proxying `/api`) against real Postgres/Redis and walked every §10 acceptance criterion live. All pass.
+- **Signature stat (the thesis), proven honestly:** injected a posting with `posted_at = now − 3min` into a watched company, then read it back through the feed API → `caughtMinutes: 3`, `seniority: NEW_GRAD` (title parser), `sponsorshipSignal: OFFERED` (body parser on "visa sponsorship available"), `salary: {130000, 160000}` (body parser), `companyName: Linear`, `source: ASHBY`. Every S6 heuristic + S8.4a company resolution firing on live data, end to end. This is the honest "caught 3 min after posting" the product exists for — verified on a posting that appeared *after* watching began (not the cold backfill).
+- **Filters (server-side, all §5):** total 2000 (D-WD10 cap) → NEW_GRAD 2, REQUIRE_OFFERED 3, LEVER 88, salaryMin=250k 165; `keywords=engineer` (1574) + `exclude=engineer` (426) = 2000 exactly (complementary). Bad enum → HTTP 400 (never a silent no-op).
+- **Job-state workflow (live):** PUT APPLIED stamped `appliedAt` + note; posting appears in `state=APPLIED`. PUT HIDDEN → drops from the default view (`NEW,SAVED,APPLIED`) and appears only in the HIDDEN view (§10 "hidden leaves the feed").
+- **Dedup (§8.3):** poll cycle logged "25 polled, 0 failed, 0 new" (boards already backfilled); a duplicate natural-key insert was rejected by `uq_posting_natural_key` (INSERT 0 0, count stayed 1).
+- **Agent status (§6/§7, D-WD12):** 25 boards (16 GH / 2 LV / 7 AS), real last poll, next = last + 2min, newToday count — all DB-derived.
+- **Frontend browser path:** app served on 5173; `/api` proxied to 8090 returned real agent-status + feed — the exact runtime path the React app uses.
+- **Fixes during verify:** `index.html` title `web` → `Watchdog — job radar` + meta description (broken-window). S9 test data cleaned from the DB after.
+- **Final gauntlets:** BE `mvn clean verify` **196 tests** green (unchanged since merge); FE typecheck + lint (0/0) + **48 tests** + build green.
+- **Honest limitations carried to Phase 2 (documented, not hidden):** cold-start catch-time is huge on a board's first poll (honest, expected); registry is 25 verified boards (grows to 500 by appending verified rows — data task); rate-limit/stagger tuning across many boards deferred; notifications + native-Mac alerts + real auth are all Phase 2 by design (spec §1).
+- **v1 acceptance: MET.** The agent polls real ATS boards on a 2-min schedule (ShedLock/Redis, resilient), dedups exactly-once, persists, computes honest catch-time, and the cyber dashboard surfaces filtered results newest-first with the live "caught N min" signature stat, working job-state workflow, and real agent-status — all against the live stack.
 
 ---
 
