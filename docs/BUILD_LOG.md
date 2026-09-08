@@ -24,7 +24,7 @@ Living state document. **Read this + the spec at the start of every session.** A
 - [x] **S0** — project scaffold (Spring + React + Postgres + Redis + Docker + CI; gauntlet green on empty) ✅
 - [x] **S1** — domain layer (models, enums, ports, typed IDs, FilterCriteria) + unit tests ✅
 - [x] **S2** — persistence (Flyway: company, posting, job_state, filter_profile, app_user) + Testcontainers ✅
-- [ ] **S3** — ATS adapters (Greenhouse → Lever → Ashby), normalize → Posting (incl. description/salary/type) + fixture parser tests
+- [x] **S3** — ATS adapters (Greenhouse → Lever → Ashby), normalize → Posting (incl. description/salary/type) + fixture parser tests ✅
 - [ ] **S4** — agent loop (scheduler + Redis lock + PollingService + DedupService + catch-time); measure poll timing
 - [ ] **S5** — company registry (500-company seed) + DiscoveryService
 - [ ] **S6** — matching/filters (all §5 dims, title+description) + salary/seniority/sponsorship parsers (pure logic, tested)
@@ -74,6 +74,17 @@ Branch `s2-persistence`, merged to `main --no-ff`. Spring Data JDBC (D-WD7) over
 - **Deferred intentionally:** app_user + filter_profile tables exist (V1) but their repo adapters wait for S7 (no adapters built we don't use).
 - **Next:** S3 — ATS adapters (Greenhouse first). Real HTTP against boards-api.greenhouse.io; parse → Posting; unit-test the parser against a captured JSON fixture.
 
+### 2026 — Session 4: S3 ATS adapters (COMPLETE)
+Branch `s3-greenhouse`, merged to `main --no-ff`. All three `JobSourcePort` implementations (Greenhouse → Lever → Ashby), each **measured against a real captured fixture** (not guessed), parser + RestClient, MockWebServer HTTP tests. Full gauntlet green: **82 tests**, jar packaged. Domain still pure.
+- **S3.1** `8c70ae1` — Greenhouse (parser + fixture). Fields: `id`→atsPostingId, `title`, `location.name`, `content`→description (HTML entities decoded via `HtmlUtils.htmlUnescape`), `first_published`→postedAt (fallback `updated_at`), `departments[0].name`. No structured salary/type → UNKNOWN. 8 tests.
+- **S3.2** `1a43c4d` — Greenhouse `RestClient` client (`JobSourcePort`), MockWebServer test. **Bug caught only by `clean verify`:** component depended on an injected `RestClient.Builder` bean absent in the test context (16 context-load errors) → fix: build `RestClient.builder()` inside the component, no bean dependency. Added `TimeConfig` (single injectable `Clock` bean, honest catch-time). 3 tests.
+- **S3.3** `fc253a3` — Lever (parser + client). Different shape: `text`→title, `categories.location`/`team`, `workplaceType`→RemoteType (real remote signal!), `createdAt` **epoch millis**→postedAt, `descriptionPlain`. Rejects non-array (misses return `{"ok":false}`). `GET /v0/postings/{slug}?mode=json`. Fixture = `leverdemo` (stable official demo). 10 tests.
+- **S3.4** `cf611fd` — Ashby (parser + client). Richest source: `jobs[]` under a wrapper obj, `employmentType` (FullTime/Intern/Contract/PartTime)→**structured EmploymentType** (only Ashby has it), `workplaceType`+`isRemote` fallback→RemoteType, `publishedAt`→postedAt. `GET /posting-api/job-board/{slug}`. Fixture = `linear`. 11 tests.
+- **S3.5** — full gauntlet green (82 tests), BUILD_LOG, merged to `main`.
+- **Impl decisions (no new D#):** HTTP via Spring `RestClient`; HTTP tests via OkHttp **MockWebServer** (real localhost HTTP, per Spring's own docs — catches client I/O differences a stub misses).
+- **Deferred:** salary + seniority + sponsorship parsing from titles/bodies → S6 (pure heuristics, own tests). Adapters are not yet wired into a poll loop → S4. No `JobSourcePort` router/registry yet → S4.
+- **Next:** S4 — the agent loop (scheduler + Redis lock + PollingService + DedupService + catch-time). First step that runs continuously.
+
 ---
 
 ## Environment gotchas (append as discovered)
@@ -83,5 +94,7 @@ Branch `s2-persistence`, merged to `main --no-ff`. Spring Data JDBC (D-WD7) over
 - Long processes: `nohup` + poll the log. No `timeout` on macOS; kill by port (`lsof -ti:PORT | xargs kill -9`). **`docker compose up` can hang the MCP call even as it succeeds — fire with `nohup` + poll, and check `docker ps` state before re-running.**
 - Background `git push` can lag/lose cwd — verify `git ls-remote` vs local HEAD; retry in foreground. **Confirmed fix: push synchronously with explicit redirect — `git push origin BR:BR > /tmp/push.log 2>&1; echo exit=$?` — the backgrounded `git push -u &` form silently fails to land the ref.**
 - **Spring Boot 4.x is modular (breaking vs 3.x):** `spring-boot-starter-web` → `spring-boot-starter-webmvc`; `@WebMvcTest` moved to `org.springframework.boot.webmvc.test.autoconfigure` and needs `spring-boot-starter-webmvc-test` (not transitive); `@MockBean` removed → use `@MockitoBean`; Flyway needs `spring-boot-starter-flyway` + `flyway-database-postgresql` (raw `flyway-core` silently no-ops).
+- **Boot 4 ships Jackson 3:** packages are `tools.jackson.databind.*` / `tools.jackson.core.*` (NOT `com.fasterxml.jackson.*`). `ObjectMapper.readTree` is now unchecked. Old Jackson-2 imports won't compile.
+- **RestClient bean gotcha:** an injected `RestClient.Builder` bean isn't always present in test contexts. Build `RestClient.builder()...build()` inside the component instead of depending on the bean. Test RestClient with OkHttp MockWebServer (real localhost HTTP). Run `mvn clean verify` before commit — isolated `-Dtest=` runs can hide context-load failures.
 - **Testcontainers 2.x renamed modules:** `testcontainers-junit-jupiter` / `testcontainers-postgresql` (old `junit-jupiter` / `postgresql` artifact IDs gone). BOM import needs explicit version in dependencyManagement.
 - **Frontend toolchain (current create-vite):** ships Vite 8 / React 19.2 / TS 6, and **oxlint** as the default linter (not ESLint). Tailwind v4 is CSS-first: no `tailwind.config.js`, no PostCSS config.
