@@ -57,6 +57,13 @@ class PostingRepositoryAdapter implements PostingRepository {
                 .toList();
     }
 
+    @Override
+    public List<Posting> findRecent(int limit) {
+        return jdbc.findRecent(limit).stream()
+                .map(PostingRepositoryAdapter::toDomain)
+                .toList();
+    }
+
     // --- mapping ---
 
     private static PostingRow toRow(Posting p, boolean isNew) {

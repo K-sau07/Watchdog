@@ -44,6 +44,14 @@ class PostingRepositoryAdapterTest extends PostgresIntegrationTest {
                 Instant.now().truncatedTo(ChronoUnit.MILLIS), raw);
     }
 
+    private Posting postingSeenAt(CompanyId companyId, String atsId, Instant firstSeenAt) {
+        return new Posting(
+                PostingId.generate(), companyId, atsId, "Software Engineer, New Grad",
+                "New York, NY", RemoteType.HYBRID, "Engineering", EmploymentType.FULL_TIME,
+                Salary.empty(), "https://x/y", "desc", SponsorshipSignal.UNKNOWN,
+                null, firstSeenAt.truncatedTo(ChronoUnit.MILLIS), null);
+    }
+
     @Test
     void saveAndFindByIdRoundTripsSalaryAndJsonb() {
         CompanyId co = newCompany("rt-" + System.nanoTime());
@@ -94,5 +102,39 @@ class PostingRepositoryAdapterTest extends PostgresIntegrationTest {
 
         assertThat(postings.findByCompany(a)).hasSize(2);
         assertThat(postings.findByCompany(b)).hasSize(1);
+    }
+
+    @Test
+    void findRecentOrdersByFirstSeenDescending() {
+        // Distinct, far-apart timestamps so ordering is unambiguous even with other rows
+        // present in the shared container.
+        CompanyId co = newCompany("recent-" + System.nanoTime());
+        Instant base = Instant.parse("2099-01-01T00:00:00Z"); // future: sorts above other tests' rows
+        Posting oldest = postingSeenAt(co, "r-old", base);
+        Posting middle = postingSeenAt(co, "r-mid", base.plusSeconds(60));
+        Posting newest = postingSeenAt(co, "r-new", base.plusSeconds(120));
+        // insert out of order to prove the query sorts, not insertion order
+        postings.save(middle);
+        postings.save(oldest);
+        postings.save(newest);
+
+        var ids = postings.findRecent(1000).stream().map(Posting::id).toList();
+        // our three, in newest-first order, appear as a subsequence
+        int iNew = ids.indexOf(newest.id());
+        int iMid = ids.indexOf(middle.id());
+        int iOld = ids.indexOf(oldest.id());
+        assertThat(iNew).isGreaterThanOrEqualTo(0);
+        assertThat(iNew).isLessThan(iMid);
+        assertThat(iMid).isLessThan(iOld);
+    }
+
+    @Test
+    void findRecentHonorsLimit() {
+        CompanyId co = newCompany("limit-" + System.nanoTime());
+        for (int i = 0; i < 5; i++) {
+            postings.save(posting(co, "lim-" + i, Salary.empty(), null));
+        }
+        // the table now has >= 3 rows; the limit caps the result size exactly
+        assertThat(postings.findRecent(3)).hasSize(3);
     }
 }

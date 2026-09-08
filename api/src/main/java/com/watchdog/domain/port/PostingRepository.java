@@ -30,4 +30,13 @@ public interface PostingRepository {
 
     /** All postings for a company (for backfill/inspection; not the filtered feed). */
     List<Posting> findByCompany(CompanyId companyId);
+
+    /**
+     * The feed's candidate set: the most-recently-seen postings, newest first (by
+     * {@code firstSeenAt} desc), capped at {@code limit}. MatchingService filters and
+     * paginates this window in memory (D-WD10, fetch-then-filter for v1). The cap bounds
+     * memory at low v1 volume; outgrowing it is the measured trigger to push filters to
+     * SQL (Phase 2).
+     */
+    List<Posting> findRecent(int limit);
 }

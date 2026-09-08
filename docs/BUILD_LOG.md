@@ -11,7 +11,7 @@ Living state document. **Read this + the spec at the start of every session.** A
 - **Stack:** Java 21 / Spring Boot (hexagonal) · React 19 / Vite / TS / Tailwind · Postgres + Flyway · Redis · Testcontainers · Docker Compose · GitHub Actions.
 - **Spec:** `docs/01_WATCHDOG_SPEC.md` (APPROVED, immutable base). **Process:** `docs/00_DEVELOPMENT_CONSTITUTION.md`.
 
-## Locked decisions (D-WD1..D-WD8)
+## Locked decisions (D-WD1..D-WD10)
 - **D-WD1** — seed registry, **500 companies**; auto-grow later.
 - **D-WD2** — **2-min** poll; staggered across the window + backoff on 429; tune empirically.
 - **D-WD3** — all three ATS in v1 (Greenhouse → Lever → Ashby, built one at a time).
@@ -20,6 +20,8 @@ Living state document. **Read this + the spec at the start of every session.** A
 - **D-WD6** — **Spring Boot 4.1.0** on Java 21 (spec-implementation). Chosen over 3.5.x, which hit OSS end-of-life 2025-06-30 (starting a new project on an already-EOL framework = born on borrowed time). 4.1 is the current stable / official new-project target. Cost: 4.x is modular (see gotchas) so some 3.x tutorials don't apply.
 - **D-WD7** — persistence via **Spring Data JDBC** (infra-implementation), over JPA/Hibernate and plain JdbcClient. Fits immutable domain records + self-contained aggregates with no ORM baggage; least code for the cleanest result. Domain stays pure — annotated row entities + adapters live in `infrastructure/persistence`, mapping row↔domain.
 - **D-WD8** — agent-loop distributed lock via **ShedLock 6.9.0 + Spring `@Scheduled`**, Redis-backed (infra-implementation), over a hand-rolled `SET NX` lock or no lock. Purpose-built for "run scheduled task on one instance"; hand-rolling correct lock expiry/renewal is exactly the subtle-breakage the constitution warns against.
+- **D-WD9** — heuristic parsers (seniority/sponsorship/salary) = **keyword/regex lists** in v1 (spec §5 + constitution §10 measure-first), over scoring or a classifier. Pure/stateless domain logic; honest UNKNOWN/empty when no rule fires. Seniority: title-first, most-senior-then-most-specific precedence, body fallback for early-career only. Sponsorship: body-first, NOT_OFFERED wins on conflict. Salary: fallback only when ATS gave no structured comp, accepts a figure only with a money signal ($/k/currency) at plausible magnitude (≥10k). Smarter classifier is a Phase-2 lever if measurement warrants.
+- **D-WD10** — dashboard read side = **fetch-then-filter in memory** for v1 (over SQL push-down or a hybrid). Bounded newest-first candidate window (`findRecent`, cap 2000), filter+enrich+paginate in memory so ALL matching stays in the tested `PostingMatcher`+parsers and pagination happens strictly after filtering. Correct + simplest at v1 volume (25 companies); outgrowing the cap is the measured trigger to push cheap cuts to SQL (Phase 2, references this decision).
 
 ## Build order & status
 - [x] **S0** — project scaffold (Spring + React + Postgres + Redis + Docker + CI; gauntlet green on empty) ✅
@@ -28,7 +30,7 @@ Living state document. **Read this + the spec at the start of every session.** A
 - [x] **S3** — ATS adapters (Greenhouse → Lever → Ashby), normalize → Posting (incl. description/salary/type) + fixture parser tests ✅
 - [x] **S4** — agent loop (scheduler + Redis lock + PollingService + DedupService + catch-time); measure poll timing ✅
 - [x] **S5** — company registry (500-company seed) + DiscoveryService ✅ (machinery done; seed = 25 verified, grows to 500)
-- [ ] **S6** — matching/filters (all §5 dims, title+description) + salary/seniority/sponsorship parsers (pure logic, tested)
+- [x] **S6** — matching/filters (all §5 dims, title+description) + salary/seniority/sponsorship parsers (pure logic, tested) ✅
 - [ ] **S7** — job-state workflow (save/applied/hide) + filter-profile CRUD (single-user, no-auth)
 - [ ] **S8** — dashboard: UI bible (`02`) first, then cyber feed + filter panel + agent-status bar + "caught N min after posting" stat + card state actions
 - [ ] **S9** — end-to-end verify (real ATS → dashboard within poll window; filters + states) + full gauntlet
@@ -106,6 +108,21 @@ Branch `s5-registry`, merged to `main --no-ff`. Registry machinery done, seeded 
 - 6 tests: 3 DiscoveryService idempotency (in-memory fakes, no Spring), 3 guarding the real seed file (parses, no dup natural keys, spans all 3 ATS).
 - **Deferred:** growing the seed to 500 verified rows (data task); registry auto-discovery (D-WD1 fast-follow); rate-limit/stagger tuning across 500 boards (D-WD2 detail) → measure in S9.
 - **Next:** S6 — matching/filters: `MatchingService` + the filtered `/api/postings` query (all §5 dims, title+description) + salary/seniority/sponsorship parsers (pure heuristics, unit-tested). This is where PostingMatcher (built in S1) gets wired to a real query + the S3-deferred body parsing lands.
+
+### 2026 — Session 7: S6 matching/filters (COMPLETE)
+Branch `s6-matching`, granular green commits, merged to `main --no-ff`. The dashboard read side is live at the API layer: the three S3-deferred heuristic parsers landed, PostingMatcher (S1) got wired to a real `GET /api/postings`, and the query is verified against real Postgres. Full gauntlet green: **157 tests** (98 → 157, +59), jar packaged. Domain still pure — all three parsers are framework-free in `domain/model` alongside PostingMatcher.
+- **S6.1** `d86156c` — `SeniorityParser` (pure). Keyword/regex, title-first with body fallback for early-career only. Precedence most-senior-then-most-specific: STAFF/SENIOR > MID > INTERN > NEW_GRAD > JUNIOR (so a senior signal never reads new-grad; a new-grad role never hides as generic JUNIOR). Word-boundary patterns guard substrings (seniority≠senior, internal≠intern). Staff/principal roll up to SENIOR (enum has no STAFF value). 14 tests.
+- **S6.2** `fa7da95` — `SponsorshipParser` (pure). Body-first over title+body; **NOT_OFFERED wins on conflict** (a false OFFERED is the costly error for a visa-dependent hunter). OFFERED requires affirmative phrasing so it doesn't fire on a negated "sponsorship". **Gauntlet caught a real bug:** the citizenship pattern missed plural "US citizens" (trailing `\b` blocked by the `s`) — fixed with an optional plural, verified in isolation. 7 tests.
+- **S6.3** `470828a` — `SalaryParser` (pure). Fallback only when ATS gave no structured comp. Honesty over recall: accepts a figure only with a money signal ($/k/currency) at plausible magnitude (≥10k) — rejects headcounts/founding-years/user-counts a bare-number match would coerce into salaries. Ranges preferred; single $-figure → min-only. Known v1 limits documented (hourly rejected not annualized; unmarked ranges rejected; bare $ → no currency). Regex prototyped in Python against realistic strings first. 11 tests.
+- **S6.4** `2323d58` — `MatchingService` (application) + read-side wiring. Completes matching by adding the three dims PostingMatcher leaves to the query layer: seniority (parser), source (Company attr via companyId→source map), job state (per-user via JobStateRepository; no row = implicitly NEW). **statesToShow handled now** (owner call) so `/api/postings` ships able to hide HIDDEN; S7 adds only the write side. Read-time enrichment (D-WD10, not persisted): parsers fill missing sponsorship/salary before matching. Fetch-then-filter-then-paginate — pagination strictly AFTER filtering. Introduced `SingleUser.ID` (D-WD5 fixed id) + `PostingRepository.findRecent` (port + JDBC `@Query` + adapter). 10 tests (in-memory fakes, no Spring).
+- **S6.5a** `57be186` — `PostingQueryParams` + `PostingQueryMapper` (pure). All §5/§7 query params → FilterCriteria: CSV lists trimmed, case-insensitive enum sets, salary/sponsorship, friendly postedWithin tokens (10m/30m/1h/today/week), ISO date range, page/size defaults + clamped max. Malformed filter → `BadFilterParam` → 400 (never a silent no-op). 11 tests.
+- **S6.5b** `ccd92e3` — `PostingController` + DTOs. Thin: `GET /api/postings` (filtered/paginated/newest-first) + `GET /api/postings/{id}` (detail). DTOs carry derived seniority/sponsorship/salary/source + the signature stat `caughtMinutes` (null when postedAt unknown, §8.4). Bad filter/id → 400, unknown id → 404. `MatchedPosting` now carries resolved AtsSource; added `findEnriched(id)`. `@WebMvcTest` slice (Boot 4 pkg + `@MockitoBean`): feed JSON shape, detail, 404, both 400s. 5 tests.
+- **S6.6** `44aa62e` — `findRecent` verified against real Postgres (Testcontainers): proves `@Query` orders by `first_seen_at DESC` (inserted out of order, asserted as newest-first subsequence — robust to the shared singleton container) + honors LIMIT. Closes the one S6 gap only covered by a fake. 2 tests.
+- **S6.7** — full gauntlet green (157 tests), BUILD_LOG + D-WD9/D-WD10, merged to `main`.
+- **Decisions:** **D-WD9** = keyword/regex-list parsers; **D-WD10** = fetch-then-filter in memory. Also gave D-WD5 its concrete `SingleUser.ID`.
+- **Owner profile note (for S6.4/S7, not the parser):** owner has 2+ yrs experience → default filter profile targets NEW_GRAD/JUNIOR/MID and does NOT exclude on a ~2-yr experience floor. Kept out of the user-agnostic SeniorityParser.
+- **Deferred to S7:** job-state **write** side (save/applied/hide mutations) + filter-profile CRUD. Runtime note: the write side needs an `app_user` row seeded with `SingleUser.ID` (read side tolerates its absence — no row = NEW).
+- **Next:** S7 — job-state workflow (save/applied/hide endpoints + repo) + filter-profile CRUD (single-user, no-auth).
 
 ---
 

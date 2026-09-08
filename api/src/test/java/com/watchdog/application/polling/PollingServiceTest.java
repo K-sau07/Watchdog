@@ -56,6 +56,9 @@ class PollingServiceTest {
             return findByNaturalKey(c, a).isPresent();
         }
         @Override public List<Posting> findByCompany(CompanyId c) { return List.of(); }
+        @Override public List<Posting> findRecent(int limit) {
+            return saved.stream().limit(limit).toList();
+        }
     }
 
     private Posting posting(CompanyId companyId, String atsId, Instant postedAt) {
