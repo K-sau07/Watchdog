@@ -8,6 +8,8 @@ logging:
 watchdog:
   polling:
     enabled: false
+  registry:
+    seed-on-startup: false
 spring:
   flyway:
     enabled: true
