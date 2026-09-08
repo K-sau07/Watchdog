@@ -11,18 +11,19 @@ Living state document. **Read this + the spec at the start of every session.** A
 - **Stack:** Java 21 / Spring Boot (hexagonal) · React 19 / Vite / TS / Tailwind · Postgres + Flyway · Redis · Testcontainers · Docker Compose · GitHub Actions.
 - **Spec:** `docs/01_WATCHDOG_SPEC.md` (APPROVED, immutable base). **Process:** `docs/00_DEVELOPMENT_CONSTITUTION.md`.
 
-## Locked decisions (D-WD1..D-WD6)
+## Locked decisions (D-WD1..D-WD7)
 - **D-WD1** — seed registry, **500 companies**; auto-grow later.
 - **D-WD2** — **2-min** poll; staggered across the window + backoff on 429; tune empirically.
 - **D-WD3** — all three ATS in v1 (Greenhouse → Lever → Ashby, built one at a time).
 - **D-WD4** — bold cyber "robot-era" UI; exact system in `02_WATCHDOG_UI_BIBLE.md` before any UI code.
 - **D-WD5** — auth deferred; v1 single-user no-auth; schema stays multi-user-ready (`user_id` columns present).
 - **D-WD6** — **Spring Boot 4.1.0** on Java 21 (spec-implementation). Chosen over 3.5.x, which hit OSS end-of-life 2025-06-30 (starting a new project on an already-EOL framework = born on borrowed time). 4.1 is the current stable / official new-project target. Cost: 4.x is modular (see gotchas) so some 3.x tutorials don't apply.
+- **D-WD7** — persistence via **Spring Data JDBC** (infra-implementation), over JPA/Hibernate and plain JdbcClient. Fits immutable domain records + self-contained aggregates with no ORM baggage; least code for the cleanest result. Domain stays pure — annotated row entities + adapters live in `infrastructure/persistence`, mapping row↔domain.
 
 ## Build order & status
 - [x] **S0** — project scaffold (Spring + React + Postgres + Redis + Docker + CI; gauntlet green on empty) ✅
 - [x] **S1** — domain layer (models, enums, ports, typed IDs, FilterCriteria) + unit tests ✅
-- [ ] **S2** — persistence (Flyway: company, posting, job_state, filter_profile, app_user) + Testcontainers
+- [x] **S2** — persistence (Flyway: company, posting, job_state, filter_profile, app_user) + Testcontainers ✅
 - [ ] **S3** — ATS adapters (Greenhouse → Lever → Ashby), normalize → Posting (incl. description/salary/type) + fixture parser tests
 - [ ] **S4** — agent loop (scheduler + Redis lock + PollingService + DedupService + catch-time); measure poll timing
 - [ ] **S5** — company registry (500-company seed) + DiscoveryService
@@ -61,6 +62,17 @@ Branch `s1-domain`, granular green commits, merged to `main --no-ff`. Pure domai
 - **S1.5** — full gauntlet green (35 tests), BUILD_LOG updated, merged to `main`.
 - **Decisions (spec-impl, no new D#):** typed IDs wrap **UUID** (domain-generated); matching = **pure predicate in domain**, S6 orchestrates.
 - **Next:** S2 — persistence (Flyway + repos + Testcontainers). Note: this is where the Watchdog Postgres/Redis stack + Testcontainers come alive; tassist still stopped.
+
+### 2026 — Session 3: S2 persistence (COMPLETE)
+Branch `s2-persistence`, merged to `main --no-ff`. Spring Data JDBC (D-WD7) over real Postgres 17 via Testcontainers. Full gauntlet green: **50 tests** (35 domain/scaffold + 15 persistence integration), jar packaged. Domain still pure — all persistence annotations confined to `infrastructure/persistence`.
+- **S2.1** `8bd0cb8` — swapped POM starter-data-jpa → starter-data-jdbc. `V1__initial_schema.sql`: all 5 tables (§4), enums as text+CHECK (Java constant names), UUID PKs (domain-minted), timestamptz, dedup unique `(company_id, ats_posting_id)` §8.3, job_state unique `(user_id, posting_id)`, raw jsonb, filter_profile text[]. Testcontainers harness `PostgresIntegrationTest` — **singleton container pattern** (start once, never stop; the `@Testcontainers`/`@Container` lifecycle stops it after the first class, breaking shared bases — diagnosed from a Connection-refused on the 2nd class). `@ServiceConnection` auto-wires datasource; test profile no longer excludes datasource. 4 tests.
+- **S2.2** `763919a` — company adapter. `CompanyRow` implements `Persistable<UUID>` (domain-minted UUIDs are never null, so isNew comes from an `existsById` check, not id==null). Derived finders + `@Query` findAllActive. 5 tests.
+- **S2.3** `2723ca2` — posting adapter (jsonb + salary + dedup). `JsonbString` wrapper type so jsonb converters target ONLY jsonb columns (raw String↔jsonb would coerce every String column); `JdbcConfig.userConverters()` registers JsonbString↔PGobject. Salary flattened to 3 cols. **POM fix:** postgres driver runtime→compile (converter references PGobject; caught at compile). 4 tests.
+- **S2.4** `726b4ca` — job-state adapter. Natural key `(user_id, posting_id)`. Test inserts a fixture app_user via JdbcClient (app_user adapter deferred to S7). 3 tests.
+- **S2.5** — full gauntlet green (50 tests), BUILD_LOG + D-WD7, merged to `main`.
+- **Decision:** **D-WD7** = Spring Data JDBC.
+- **Deferred intentionally:** app_user + filter_profile tables exist (V1) but their repo adapters wait for S7 (no adapters built we don't use).
+- **Next:** S3 — ATS adapters (Greenhouse first). Real HTTP against boards-api.greenhouse.io; parse → Posting; unit-test the parser against a captured JSON fixture.
 
 ---
 
