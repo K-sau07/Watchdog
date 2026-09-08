@@ -1,0 +1,33 @@
+package com.watchdog.domain.port;
+
+import com.watchdog.domain.id.CompanyId;
+import com.watchdog.domain.id.PostingId;
+import com.watchdog.domain.model.Posting;
+
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * Outbound port: persistence for {@link Posting}. Implemented in infrastructure
+ * (S2, Postgres + Flyway). The dedup contract (spec §8.3) lives here: a posting is
+ * uniquely identified by {@code (companyId, atsPostingId)}.
+ */
+public interface PostingRepository {
+
+    /** Persist a new posting (or update if the natural key already exists). */
+    Posting save(Posting posting);
+
+    Optional<Posting> findById(PostingId id);
+
+    /**
+     * Dedup lookup: has this exact posting (by natural key) already been seen?
+     * Drives "new exactly once" in the agent loop (S4).
+     */
+    Optional<Posting> findByNaturalKey(CompanyId companyId, String atsPostingId);
+
+    /** True when {@code (companyId, atsPostingId)} already exists — fast dedup check. */
+    boolean existsByNaturalKey(CompanyId companyId, String atsPostingId);
+
+    /** All postings for a company (for backfill/inspection; not the filtered feed). */
+    List<Posting> findByCompany(CompanyId companyId);
+}
