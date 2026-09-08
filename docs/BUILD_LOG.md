@@ -27,7 +27,7 @@ Living state document. **Read this + the spec at the start of every session.** A
 - [x] **S2** — persistence (Flyway: company, posting, job_state, filter_profile, app_user) + Testcontainers ✅
 - [x] **S3** — ATS adapters (Greenhouse → Lever → Ashby), normalize → Posting (incl. description/salary/type) + fixture parser tests ✅
 - [x] **S4** — agent loop (scheduler + Redis lock + PollingService + DedupService + catch-time); measure poll timing ✅
-- [ ] **S5** — company registry (500-company seed) + DiscoveryService
+- [x] **S5** — company registry (500-company seed) + DiscoveryService ✅ (machinery done; seed = 25 verified, grows to 500)
 - [ ] **S6** — matching/filters (all §5 dims, title+description) + salary/seniority/sponsorship parsers (pure logic, tested)
 - [ ] **S7** — job-state workflow (save/applied/hide) + filter-profile CRUD (single-user, no-auth)
 - [ ] **S8** — dashboard: UI bible (`02`) first, then cyber feed + filter panel + agent-status bar + "caught N min after posting" stat + card state actions
@@ -95,6 +95,17 @@ Branch `s4-agent-loop`, merged to `main --no-ff`. **The engine is alive** — ve
 - **Live-run note:** app default port 8080 collided (something else on the Mac) — ran the manual verification on `--server.port=8090`. The 8080 occupant is unrelated to Watchdog.
 - **Deferred:** rate-limit/backoff + staggering across the window (D-WD2 detail) → tune in S5/S9 with the 500-company seed (measure-first). Salary/seniority/sponsorship parsing → S6. Registry is still hand-seeded (one company) → S5 DiscoveryService + 500-seed.
 - **Next:** S5 — company registry: seed 500 known Greenhouse/Lever/Ashby companies (D-WD1) + DiscoveryService.
+
+### 2026 — Session 6: S5 company registry (COMPLETE)
+Branch `s5-registry`, merged to `main --no-ff`. Registry machinery done, seeded with **25 verified** boards (grows to 500 by appending verified rows). Full gauntlet green: **98 tests**, jar packaged. Domain still pure. **LIVE-VERIFIED:** booted app → "Registry seed complete: 24 added, 1 already present" → DB shows 25 companies (16 Greenhouse / 7 Ashby / 2 Lever).
+- **Scope call (owner):** machinery-first + verified starter set, NOT 500 fabricated slugs (a wrong slug 404s in the poll cycle — that's slop). Every one of the 25 slugs was probed against the live ATS API before adding. The "500" is now a data-growth task (append verified rows), not code.
+- `companies-seed.json` (resources/seed): verified name/source/slug rows, documented to grow to 500.
+- `CompanySeedSource` port (application) + `JsonCompanySeedSource` (infra, Jackson 3, skips malformed rows).
+- `DiscoveryService` (application): idempotent upsert by natural key (source+slug) — skips existing, safe every startup; returns added/skipped.
+- `RegistrySeedRunner` (ApplicationRunner, `@ConditionalOnProperty watchdog.registry.seed-on-startup`, default true; **false in test profile**).
+- 6 tests: 3 DiscoveryService idempotency (in-memory fakes, no Spring), 3 guarding the real seed file (parses, no dup natural keys, spans all 3 ATS).
+- **Deferred:** growing the seed to 500 verified rows (data task); registry auto-discovery (D-WD1 fast-follow); rate-limit/stagger tuning across 500 boards (D-WD2 detail) → measure in S9.
+- **Next:** S6 — matching/filters: `MatchingService` + the filtered `/api/postings` query (all §5 dims, title+description) + salary/seniority/sponsorship parsers (pure heuristics, unit-tested). This is where PostingMatcher (built in S1) gets wired to a real query + the S3-deferred body parsing lands.
 
 ---
 
