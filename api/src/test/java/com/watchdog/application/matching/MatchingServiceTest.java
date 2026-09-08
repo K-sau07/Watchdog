@@ -55,6 +55,9 @@ class MatchingServiceTest {
                     .sorted((a, b) -> b.firstSeenAt().compareTo(a.firstSeenAt()))
                     .limit(limit).toList();
         }
+        @Override public List<Posting> findSeenSince(java.time.Instant since) {
+            return store.stream().filter(p -> !p.firstSeenAt().isBefore(since)).toList();
+        }
     }
 
     private static class FakeCompanyRepo implements CompanyRepository {

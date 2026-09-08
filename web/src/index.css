@@ -1,16 +1,83 @@
 @import "tailwindcss";
 
 /*
- * S0: minimal base only. The cyber "robot-era" design system —
- * tokens, fonts, radar palette — lands in S8 after the UI bible (doc 02),
- * per D-WD4. Nothing decorative here on purpose.
+ * Watchdog design tokens — from docs/02_WATCHDOG_UI_BIBLE.md (§2 color, §3 type).
+ * Tailwind v4 CSS-first: tokens live in @theme so they're available as utilities
+ * (bg-void, text-hi, font-mono, ...) and as raw CSS vars. Dark-first, no light mode
+ * (G-UI4): the palette IS the design, not an inversion.
  */
-:root {
-  color-scheme: light dark;
+
+/* Fonts — humanist-technical pairing (G-UI1). */
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,400;9..144,500&display=swap");
+
+@theme {
+  /* Surfaces — deep charcoal, not pure black (halation on moving content). */
+  --color-void: #0a0b0d;
+  --color-surface: #121418;
+  --color-card: #16191e;
+  --color-card-hover: #1c2027;
+  --color-line: #24282f;
+  --color-line-strong: #333941;
+
+  /* Text steps. */
+  --color-text-hi: #eceef2;
+  --color-text-mid: #a7adb8;
+  --color-text-lo: #6b717c;
+
+  /* Amber — THE accent, two temperatures (G-UI0). */
+  --color-amber: #ffb020;
+  --color-amber-hot: #ffd36b;
+  --color-amber-dim: #b87a16;
+
+  /* Semantic — muted on purpose; never competes with amber. */
+  --color-ok: #4db27a;
+  --color-warn: #c77d3a;
+  --color-danger: #c7534a;
+  --color-badge: #2a2f37;
+
+  /* Type roles. */
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-voice: "Fraunces", ui-serif, Georgia, serif;
 }
 
+/* Raw values used as shadow/bg (not @theme colors). */
+:root {
+  --amber-glow: rgba(255, 176, 32, 0.16);
+  --amber-glow-hot: rgba(255, 211, 107, 0.28);
+  color-scheme: dark;
+}
+
+html,
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--color-void);
+  color: var(--color-text-hi);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The one orchestrated motion moment (bible §6): a fresh arrival pulses hot->steady once. */
+@keyframes fresh-pulse {
+  0% { box-shadow: 0 0 0 0 var(--amber-glow-hot); }
+  60% { box-shadow: 0 0 18px 2px var(--amber-glow-hot); }
+  100% { box-shadow: 0 0 10px 0 var(--amber-glow); }
+}
+
+/* The "watching" heartbeat — slow breath on the live dot. */
+@keyframes heartbeat {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

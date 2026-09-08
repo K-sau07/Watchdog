@@ -59,6 +59,9 @@ class PollingServiceTest {
         @Override public List<Posting> findRecent(int limit) {
             return saved.stream().limit(limit).toList();
         }
+        @Override public List<Posting> findSeenSince(Instant since) {
+            return saved.stream().filter(p -> !p.firstSeenAt().isBefore(since)).toList();
+        }
     }
 
     private Posting posting(CompanyId companyId, String atsId, Instant postedAt) {
