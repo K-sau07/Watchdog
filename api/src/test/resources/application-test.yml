@@ -1,9 +1,13 @@
 # S2 test profile: real Postgres via Testcontainers (@ServiceConnection).
 # The container supplies the datasource; Flyway runs V1 against it.
-# Show SQL parameters in test logs for easier debugging.
+# S4: scheduler OFF in tests — no Redis needed, no background poll firing
+# mid-test; tests invoke PollingUseCase.runOnce() directly.
 logging:
   level:
     org.springframework.jdbc.core: INFO
+watchdog:
+  polling:
+    enabled: false
 spring:
   flyway:
     enabled: true
