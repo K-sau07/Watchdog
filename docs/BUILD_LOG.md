@@ -11,7 +11,7 @@ Living state document. **Read this + the spec at the start of every session.** A
 - **Stack:** Java 21 / Spring Boot (hexagonal) · React 19 / Vite / TS / Tailwind · Postgres + Flyway · Redis · Testcontainers · Docker Compose · GitHub Actions.
 - **Spec:** `docs/01_WATCHDOG_SPEC.md` (APPROVED, immutable base). **Process:** `docs/00_DEVELOPMENT_CONSTITUTION.md`.
 
-## Locked decisions (D-WD1..D-WD7)
+## Locked decisions (D-WD1..D-WD8)
 - **D-WD1** — seed registry, **500 companies**; auto-grow later.
 - **D-WD2** — **2-min** poll; staggered across the window + backoff on 429; tune empirically.
 - **D-WD3** — all three ATS in v1 (Greenhouse → Lever → Ashby, built one at a time).
@@ -19,13 +19,14 @@ Living state document. **Read this + the spec at the start of every session.** A
 - **D-WD5** — auth deferred; v1 single-user no-auth; schema stays multi-user-ready (`user_id` columns present).
 - **D-WD6** — **Spring Boot 4.1.0** on Java 21 (spec-implementation). Chosen over 3.5.x, which hit OSS end-of-life 2025-06-30 (starting a new project on an already-EOL framework = born on borrowed time). 4.1 is the current stable / official new-project target. Cost: 4.x is modular (see gotchas) so some 3.x tutorials don't apply.
 - **D-WD7** — persistence via **Spring Data JDBC** (infra-implementation), over JPA/Hibernate and plain JdbcClient. Fits immutable domain records + self-contained aggregates with no ORM baggage; least code for the cleanest result. Domain stays pure — annotated row entities + adapters live in `infrastructure/persistence`, mapping row↔domain.
+- **D-WD8** — agent-loop distributed lock via **ShedLock 6.9.0 + Spring `@Scheduled`**, Redis-backed (infra-implementation), over a hand-rolled `SET NX` lock or no lock. Purpose-built for "run scheduled task on one instance"; hand-rolling correct lock expiry/renewal is exactly the subtle-breakage the constitution warns against.
 
 ## Build order & status
 - [x] **S0** — project scaffold (Spring + React + Postgres + Redis + Docker + CI; gauntlet green on empty) ✅
 - [x] **S1** — domain layer (models, enums, ports, typed IDs, FilterCriteria) + unit tests ✅
 - [x] **S2** — persistence (Flyway: company, posting, job_state, filter_profile, app_user) + Testcontainers ✅
 - [x] **S3** — ATS adapters (Greenhouse → Lever → Ashby), normalize → Posting (incl. description/salary/type) + fixture parser tests ✅
-- [ ] **S4** — agent loop (scheduler + Redis lock + PollingService + DedupService + catch-time); measure poll timing
+- [x] **S4** — agent loop (scheduler + Redis lock + PollingService + DedupService + catch-time); measure poll timing ✅
 - [ ] **S5** — company registry (500-company seed) + DiscoveryService
 - [ ] **S6** — matching/filters (all §5 dims, title+description) + salary/seniority/sponsorship parsers (pure logic, tested)
 - [ ] **S7** — job-state workflow (save/applied/hide) + filter-profile CRUD (single-user, no-auth)
@@ -84,6 +85,16 @@ Branch `s3-greenhouse`, merged to `main --no-ff`. All three `JobSourcePort` impl
 - **Impl decisions (no new D#):** HTTP via Spring `RestClient`; HTTP tests via OkHttp **MockWebServer** (real localhost HTTP, per Spring's own docs — catches client I/O differences a stub misses).
 - **Deferred:** salary + seniority + sponsorship parsing from titles/bodies → S6 (pure heuristics, own tests). Adapters are not yet wired into a poll loop → S4. No `JobSourcePort` router/registry yet → S4.
 - **Next:** S4 — the agent loop (scheduler + Redis lock + PollingService + DedupService + catch-time). First step that runs continuously.
+
+### 2026 — Session 5: S4 agent loop (COMPLETE)
+Branch `s4-agent-loop`, merged to `main --no-ff`. **The engine is alive** — verified LIVE against the real stack, not just tests: booted the app, scheduler fired every 20s, seeded Linear (Ashby) → one cycle polled 1 company → **29 real postings persisted**, next cycle found **0 new (dedup works in production)**. Full gauntlet green: **92 tests**, jar packaged. Domain still pure.
+- **S4.1+S4.2** `643d33c` — `AtsSourceRouter` (injects all `JobSourcePort` beans, indexes by `source()`, self-wires new adapters, rejects dup/missing) + `PollingService implements PollingUseCase.runOnce()`: per active company route→fetch→dedup by natural key→persist new→mark `polledAt`; resilient (one source failure caught/logged/counted, cycle continues §8.5); median catch-time over new postings w/ known postedAt (empty when none §8.4). 10 unit tests via in-memory fakes (no Spring/DB/HTTP).
+- **S4.3+S4.4** `b1e5bf4` — Redis lock + scheduler (D-WD8). Deps: `spring-boot-starter-data-redis` + `shedlock-spring` + `shedlock-provider-redis-spring` 6.9.0. `SchedulingConfig` (`@EnableScheduling` + `@EnableSchedulerLock`, `RedisLockProvider` env "watchdog"). `PollScheduler` `@Scheduled(fixedDelay = watchdog.polling.interval-ms default 120000 = D-WD2)` + `@SchedulerLock(lockAtMostFor PT5M, lockAtLeastFor PT5S)`. Both gated by `watchdog.polling.enabled` (default true; **false in test profile** → scheduler off in tests, no Redis needed). Cleaned dead JPA config from dev profile (we're on JDBC), added Redis conn.
+- **S4.5** — full gauntlet green (92 tests), BUILD_LOG + D-WD8, merged to `main`.
+- **Decision:** **D-WD8** = ShedLock + `@Scheduled`.
+- **Live-run note:** app default port 8080 collided (something else on the Mac) — ran the manual verification on `--server.port=8090`. The 8080 occupant is unrelated to Watchdog.
+- **Deferred:** rate-limit/backoff + staggering across the window (D-WD2 detail) → tune in S5/S9 with the 500-company seed (measure-first). Salary/seniority/sponsorship parsing → S6. Registry is still hand-seeded (one company) → S5 DiscoveryService + 500-seed.
+- **Next:** S5 — company registry: seed 500 known Greenhouse/Lever/Ashby companies (D-WD1) + DiscoveryService.
 
 ---
 
