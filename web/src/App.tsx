@@ -34,12 +34,54 @@ function App() {
   const onState = (id: string, state: JobState) => setState.mutate({ id, state })
   const resetFilters = () => setFilter(EMPTY_FILTER)
 
+  const [railOpen, setRailOpen] = useState(false)
+  const filterCount = activeCount(filter)
+
   return (
     <div className="min-h-screen bg-void text-text-hi">
       <AgentStatusBar status={status.data} isError={status.isError} nowMs={nowMs} />
 
+      {/* Mobile-only: a bar to open the filter drawer (rail is pinned on desktop). */}
+      <div className="flex items-center gap-3 border-b border-line px-4 py-2 md:hidden">
+        <button
+          type="button"
+          onClick={() => setRailOpen(true)}
+          className="rounded border border-line px-3 py-1 text-[13px] text-text-mid transition-colors hover:bg-card-hover"
+        >
+          filters{filterCount > 0 ? ` (${filterCount})` : ''}
+        </button>
+      </div>
+
       <div className="flex flex-col md:flex-row">
-        <FilterRail value={filter} onChange={setFilter} onReset={resetFilters} />
+        {/* Desktop: static rail. */}
+        <div className="hidden md:block">
+          <FilterRail value={filter} onChange={setFilter} onReset={resetFilters} />
+        </div>
+
+        {/* Mobile: slide-in drawer over a scrim. */}
+        {railOpen ? (
+          <div className="fixed inset-0 z-20 md:hidden">
+            <div
+              className="absolute inset-0 bg-black/60"
+              onClick={() => setRailOpen(false)}
+              aria-hidden="true"
+            />
+            <div className="absolute inset-y-0 left-0 w-[85%] max-w-[320px] overflow-y-auto">
+              <div className="flex items-center justify-between border-b border-line bg-surface px-4 py-3">
+                <span className="font-display text-[15px] text-text-hi">filters</span>
+                <button
+                  type="button"
+                  aria-label="Close filters"
+                  onClick={() => setRailOpen(false)}
+                  className="rounded px-2 py-1 text-text-mid hover:text-text-hi"
+                >
+                  ✕
+                </button>
+              </div>
+              <FilterRail value={filter} onChange={setFilter} onReset={resetFilters} />
+            </div>
+          </div>
+        ) : null}
 
         <main className="flex-1 px-4 py-6 md:px-8">
           <HeroStat medianMinutes={status.data?.medianCatchMinutesToday ?? null} isLive={!status.isError} />
@@ -48,7 +90,7 @@ function App() {
             postings={postings}
             isLoading={feed.isLoading}
             isError={feed.isError}
-            hasActiveFilters={activeCount(filter) > 0}
+            hasActiveFilters={filterCount > 0}
             onState={onState}
             onResetFilters={resetFilters}
             onRetry={() => feed.refetch()}
