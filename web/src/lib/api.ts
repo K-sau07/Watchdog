@@ -16,6 +16,7 @@ export interface SalaryDto {
 export interface PostingSummary {
   id: string;
   title: string;
+  companyName: string | null;
   location: string | null;
   remoteType: string;
   employmentType: string;
