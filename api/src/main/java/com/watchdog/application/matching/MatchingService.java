@@ -1,6 +1,7 @@
 package com.watchdog.application.matching;
 
 import com.watchdog.domain.id.CompanyId;
+import com.watchdog.domain.id.PostingId;
 import com.watchdog.domain.model.AtsSource;
 import com.watchdog.domain.model.Company;
 import com.watchdog.domain.model.FilterCriteria;
@@ -23,6 +24,7 @@ import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -83,6 +85,7 @@ public class MatchingService {
         List<MatchedPosting> matched = postings.findRecent(CANDIDATE_LIMIT).stream()
                 .map(this::enrich)
                 .filter(m -> matchesAll(m, criteria, now, sourceById))
+                .map(m -> m.withSource(sourceById.get(m.posting().companyId())))
                 .sorted(Comparator.comparing(
                         (MatchedPosting m) -> m.posting().firstSeenAt()).reversed())
                 .toList();
@@ -92,6 +95,21 @@ public class MatchingService {
         int to = Math.min(from + size, total);
         List<MatchedPosting> pageItems = matched.subList(from, to);
         return new Page(pageItems, page, size, total);
+    }
+
+    /**
+     * A single enriched posting for the detail view (spec §7 {@code GET /api/postings/{id}}),
+     * or empty when unknown. Same read-time enrichment as the feed; source resolved from the
+     * owning company.
+     */
+    public Optional<MatchedPosting> findEnriched(PostingId id) {
+        return postings.findById(id).map(p -> {
+            MatchedPosting m = enrich(p);
+            AtsSource source = companies.findById(p.companyId())
+                    .map(Company::atsSource)
+                    .orElse(null);
+            return m.withSource(source);
+        });
     }
 
     // --- enrichment: fill heuristic fields the ATS didn't provide (read-time) ---
@@ -155,8 +173,19 @@ public class MatchingService {
 
     // --- result types ---
 
-    /** A posting that passed the filter, plus the seniority derived at read time. */
-    public record MatchedPosting(Posting posting, Seniority seniority) {
+    /**
+     * A posting that passed the filter, plus values derived at read time: the parsed
+     * {@link Seniority} and the resolved ATS {@code source} (null only if the posting's
+     * company is no longer active/known). Source is attached after matching in
+     * {@link #search}.
+     */
+    public record MatchedPosting(Posting posting, Seniority seniority, AtsSource source) {
+        MatchedPosting(Posting posting, Seniority seniority) {
+            this(posting, seniority, null);
+        }
+        MatchedPosting withSource(AtsSource resolved) {
+            return new MatchedPosting(posting, seniority, resolved);
+        }
     }
 
     /** One page of matched postings (newest first) with paging metadata. */
