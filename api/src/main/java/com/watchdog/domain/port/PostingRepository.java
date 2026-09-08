@@ -39,4 +39,11 @@ public interface PostingRepository {
      * SQL (Phase 2).
      */
     List<Posting> findRecent(int limit);
+
+    /**
+     * Postings first seen at or after {@code since}, newest first. Powers the agent-status
+     * "new today" count + "median catch-time today" (spec §7 /api/agent/status, D-WD12
+     * DB-derived). Caller passes the start-of-day instant.
+     */
+    List<Posting> findSeenSince(java.time.Instant since);
 }

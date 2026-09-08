@@ -64,6 +64,13 @@ class PostingRepositoryAdapter implements PostingRepository {
                 .toList();
     }
 
+    @Override
+    public List<Posting> findSeenSince(java.time.Instant since) {
+        return jdbc.findSeenSince(since).stream()
+                .map(PostingRepositoryAdapter::toDomain)
+                .toList();
+    }
+
     // --- mapping ---
 
     private static PostingRow toRow(Posting p, boolean isNew) {

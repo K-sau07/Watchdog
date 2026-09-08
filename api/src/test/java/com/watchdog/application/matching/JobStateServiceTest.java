@@ -61,6 +61,7 @@ class JobStateServiceTest {
         @Override public boolean existsByNaturalKey(CompanyId c, String a) { return false; }
         @Override public List<Posting> findByCompany(CompanyId c) { return List.of(); }
         @Override public List<Posting> findRecent(int limit) { return List.of(); }
+        @Override public List<Posting> findSeenSince(java.time.Instant since) { return List.of(); }
     }
 
     private PostingId seedPosting() {
