@@ -79,13 +79,13 @@ public class MatchingService {
             throw new IllegalArgumentException("page size must be positive");
         }
         Instant now = Instant.now(clock);
-        Map<CompanyId, AtsSource> sourceById = companies.findActive().stream()
-                .collect(Collectors.toMap(Company::id, Company::atsSource, (a, b) -> a));
+        Map<CompanyId, Company> companyById = companies.findActive().stream()
+                .collect(Collectors.toMap(Company::id, c -> c, (a, b) -> a));
 
         List<MatchedPosting> matched = postings.findRecent(CANDIDATE_LIMIT).stream()
                 .map(this::enrich)
-                .filter(m -> matchesAll(m, criteria, now, sourceById))
-                .map(m -> m.withSource(sourceById.get(m.posting().companyId())))
+                .filter(m -> matchesAll(m, criteria, now, companyById))
+                .map(m -> m.withCompany(companyById.get(m.posting().companyId())))
                 .sorted(Comparator.comparing(
                         (MatchedPosting m) -> m.posting().firstSeenAt()).reversed())
                 .toList();
@@ -105,10 +105,9 @@ public class MatchingService {
     public Optional<MatchedPosting> findEnriched(PostingId id) {
         return postings.findById(id).map(p -> {
             MatchedPosting m = enrich(p);
-            AtsSource source = companies.findById(p.companyId())
-                    .map(Company::atsSource)
-                    .orElse(null);
-            return m.withSource(source);
+            return companies.findById(p.companyId())
+                    .map(m::withCompany)
+                    .orElse(m);
         });
     }
 
@@ -138,11 +137,11 @@ public class MatchingService {
     // --- matching: PostingMatcher + the three dimensions it leaves to the query layer ---
 
     private boolean matchesAll(MatchedPosting m, FilterCriteria criteria, Instant now,
-                               Map<CompanyId, AtsSource> sourceById) {
+                               Map<CompanyId, Company> companyById) {
         Posting p = m.posting();
         return PostingMatcher.matches(p, criteria, now)
                 && matchesSeniority(m.seniority(), criteria)
-                && matchesSource(p.companyId(), criteria, sourceById)
+                && matchesSource(p.companyId(), criteria, companyById)
                 && matchesState(p, criteria);
     }
 
@@ -152,10 +151,10 @@ public class MatchingService {
     }
 
     private static boolean matchesSource(CompanyId companyId, FilterCriteria criteria,
-                                         Map<CompanyId, AtsSource> sourceById) {
+                                         Map<CompanyId, Company> companyById) {
         if (criteria.sources().isEmpty()) return true;
-        AtsSource source = sourceById.get(companyId);
-        return source != null && criteria.sources().contains(source);
+        Company company = companyById.get(companyId);
+        return company != null && criteria.sources().contains(company.atsSource());
     }
 
     /**
@@ -175,16 +174,19 @@ public class MatchingService {
 
     /**
      * A posting that passed the filter, plus values derived at read time: the parsed
-     * {@link Seniority} and the resolved ATS {@code source} (null only if the posting's
-     * company is no longer active/known). Source is attached after matching in
-     * {@link #search}.
+     * {@link Seniority}, the resolved ATS {@code source}, and the owning {@code companyName}
+     * (both null only if the posting's company is no longer active/known). Company details
+     * are attached after matching in {@link #search} / {@link #findEnriched}.
      */
-    public record MatchedPosting(Posting posting, Seniority seniority, AtsSource source) {
+    public record MatchedPosting(Posting posting, Seniority seniority, AtsSource source,
+                                 String companyName) {
         MatchedPosting(Posting posting, Seniority seniority) {
-            this(posting, seniority, null);
+            this(posting, seniority, null, null);
         }
-        MatchedPosting withSource(AtsSource resolved) {
-            return new MatchedPosting(posting, seniority, resolved);
+        MatchedPosting withCompany(Company company) {
+            return company == null
+                    ? this
+                    : new MatchedPosting(posting, seniority, company.atsSource(), company.name());
         }
     }
 
