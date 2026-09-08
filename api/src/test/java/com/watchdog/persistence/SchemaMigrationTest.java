@@ -49,4 +49,16 @@ class SchemaMigrationTest extends PostgresIntegrationTest {
                 .single();
         assertThat(count).isEqualTo(1L);
     }
+
+    @Test
+    void singleUserIsSeededByV2() {
+        // D-WD11: the sole v1 user (SingleUser.ID) must exist so job_state /
+        // filter_profile FKs resolve for the workflow endpoints (S7).
+        Long count = jdbc.sql(
+                        "SELECT count(*) FROM app_user WHERE id = " +
+                        "'00000000-0000-0000-0000-000000000001'")
+                .query(Long.class)
+                .single();
+        assertThat(count).isEqualTo(1L);
+    }
 }
