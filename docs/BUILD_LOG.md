@@ -11,7 +11,7 @@ Living state document. **Read this + the spec at the start of every session.** A
 - **Stack:** Java 21 / Spring Boot (hexagonal) · React 19 / Vite / TS / Tailwind · Postgres + Flyway · Redis · Testcontainers · Docker Compose · GitHub Actions.
 - **Spec:** `docs/01_WATCHDOG_SPEC.md` (APPROVED, immutable base). **Process:** `docs/00_DEVELOPMENT_CONSTITUTION.md`.
 
-## Locked decisions (D-WD1..D-WD10)
+## Locked decisions (D-WD1..D-WD11)
 - **D-WD1** — seed registry, **500 companies**; auto-grow later.
 - **D-WD2** — **2-min** poll; staggered across the window + backoff on 429; tune empirically.
 - **D-WD3** — all three ATS in v1 (Greenhouse → Lever → Ashby, built one at a time).
@@ -22,6 +22,7 @@ Living state document. **Read this + the spec at the start of every session.** A
 - **D-WD8** — agent-loop distributed lock via **ShedLock 6.9.0 + Spring `@Scheduled`**, Redis-backed (infra-implementation), over a hand-rolled `SET NX` lock or no lock. Purpose-built for "run scheduled task on one instance"; hand-rolling correct lock expiry/renewal is exactly the subtle-breakage the constitution warns against.
 - **D-WD9** — heuristic parsers (seniority/sponsorship/salary) = **keyword/regex lists** in v1 (spec §5 + constitution §10 measure-first), over scoring or a classifier. Pure/stateless domain logic; honest UNKNOWN/empty when no rule fires. Seniority: title-first, most-senior-then-most-specific precedence, body fallback for early-career only. Sponsorship: body-first, NOT_OFFERED wins on conflict. Salary: fallback only when ATS gave no structured comp, accepts a figure only with a money signal ($/k/currency) at plausible magnitude (≥10k). Smarter classifier is a Phase-2 lever if measurement warrants.
 - **D-WD10** — dashboard read side = **fetch-then-filter in memory** for v1 (over SQL push-down or a hybrid). Bounded newest-first candidate window (`findRecent`, cap 2000), filter+enrich+paginate in memory so ALL matching stays in the tested `PostingMatcher`+parsers and pagination happens strictly after filtering. Correct + simplest at v1 volume (25 companies); outgrowing the cap is the measured trigger to push cheap cuts to SQL (Phase 2, references this decision).
+- **D-WD11** — seed the single v1 user (`SingleUser.ID`) via **Flyway migration V2** (`INSERT ... ON CONFLICT DO NOTHING`), over an ApplicationRunner. The sole-user id is a schema fact (D-WD5), so it belongs in a migration — runs in prod + Testcontainers automatically, idempotent, no runtime code, harmless once real auth arrives. Also: filter-profile `GET` **auto-provisions** a default on first read (no 404 dance) — the home for the owner's 2-YoE hunt default.
 
 ## Build order & status
 - [x] **S0** — project scaffold (Spring + React + Postgres + Redis + Docker + CI; gauntlet green on empty) ✅
@@ -31,7 +32,7 @@ Living state document. **Read this + the spec at the start of every session.** A
 - [x] **S4** — agent loop (scheduler + Redis lock + PollingService + DedupService + catch-time); measure poll timing ✅
 - [x] **S5** — company registry (500-company seed) + DiscoveryService ✅ (machinery done; seed = 25 verified, grows to 500)
 - [x] **S6** — matching/filters (all §5 dims, title+description) + salary/seniority/sponsorship parsers (pure logic, tested) ✅
-- [ ] **S7** — job-state workflow (save/applied/hide) + filter-profile CRUD (single-user, no-auth)
+- [x] **S7** — job-state workflow (save/applied/hide) + filter-profile CRUD (single-user, no-auth) ✅
 - [ ] **S8** — dashboard: UI bible (`02`) first, then cyber feed + filter panel + agent-status bar + "caught N min after posting" stat + card state actions
 - [ ] **S9** — end-to-end verify (real ATS → dashboard within poll window; filters + states) + full gauntlet
 - **Phase 2+** — notifications (email/Telegram), native-Mac menubar notifier, registry auto-expansion, smarter title/visa classifier, multi-user auth + UI
@@ -123,6 +124,18 @@ Branch `s6-matching`, granular green commits, merged to `main --no-ff`. The dash
 - **Owner profile note (for S6.4/S7, not the parser):** owner has 2+ yrs experience → default filter profile targets NEW_GRAD/JUNIOR/MID and does NOT exclude on a ~2-yr experience floor. Kept out of the user-agnostic SeniorityParser.
 - **Deferred to S7:** job-state **write** side (save/applied/hide mutations) + filter-profile CRUD. Runtime note: the write side needs an `app_user` row seeded with `SingleUser.ID` (read side tolerates its absence — no row = NEW).
 - **Next:** S7 — job-state workflow (save/applied/hide endpoints + repo) + filter-profile CRUD (single-user, no-auth).
+
+### 2026 — Session 8: S7 job-state workflow + filter-profile CRUD (COMPLETE)
+Branch `s7-workflow`, granular green commits, merged to `main --no-ff`. The daily workflow write side + saved-filter CRUD are live end-to-end. Full gauntlet green: **187 tests** (157 → 187, +30), jar packaged. Domain still pure — new `FilterProfile` record is framework-free; all persistence annotations stay in `infrastructure/persistence`.
+- **S7.1** `85ba8c7` — `V2__seed_single_user.sql` seeds `SingleUser.ID` (D-WD11, idempotent `ON CONFLICT DO NOTHING`) so job_state/filter_profile FKs resolve. Testcontainers assert. Unblocks all write paths.
+- **S7.2** `c63525b` — `JobStateService` (application): upsert-by-natural-key transition (load existing row preserving id, or `initial`, then transition) so it never violates `(user_id, posting_id)`. APPLIED stamps appliedAt; null note preserves. Missing posting → PostingNotFound. 6 unit tests (fakes).
+- **S7.3** `517b446` — `JobStateController` `PUT /api/postings/{id}/state` (SAVED/APPLIED/HIDDEN + note). Separate from read-only PostingController (same base, distinct method+path). 404 unknown / 400 bad state|id. `@WebMvcTest`, 6 tests.
+- **S7.4** `996e645` — `FilterProfile` domain record (wraps FilterCriteria — reuse, per decision) + `FilterProfileRepository` port + Spring Data JDBC adapter/row/repo. Maps `filter_profile`: TEXT[]↔List/enum-set (native String[]), enum↔text, Duration↔posted_within_sec BIGINT — all in infra. Known: `remote_pref` single column (spec §4 singular) stores first of a remoteTypes set; profiles round-trip empty sources/statesToShow (those are live-query-only). Testcontainers: full round-trip, empty criteria, update-preserves-id, findByUser. 4 tests.
+- **S7.5** `6487d60` — `FilterProfileService` (auto-provision default on first read, idempotent — D-WD11 note) + `FilterProfileController` `GET /default`, `GET /{id}`, `PUT /{id}` + JSON DTOs. Default encodes owner's hunt: early-career SWE, NEW_GRAD/JUNIOR/MID, no experience-floor exclusion (2-YoE profile default, NOT in the parser). 6 service + 7 controller tests.
+- **S7.6** — full gauntlet green (187 tests), BUILD_LOG + D-WD11, merged to `main`.
+- **Decision:** **D-WD11** = seed single user via Flyway V2; filter-profile GET auto-provisions.
+- **Deferred:** real JWT auth (Phase 2 — schema already carries `user_id`); job-state filtering in the feed already shipped in S6.4 (read side), so S7 was purely the write side + profiles as planned.
+- **Next:** S8 — the dashboard. Per D-WD4: write `02_WATCHDOG_UI_BIBLE.md` FIRST (research-grounded, bold cyber/robot-era, options presented), then the cyber feed + exhaustive filter panel + agent-status bar + "caught N min after posting" signature stat + card state actions (Save/Applied/Hide wired to `PUT /api/postings/{id}/state`).
 
 ---
 
