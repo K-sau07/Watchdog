@@ -21,7 +21,7 @@ Living state document. **Read this + the spec at the start of every session.** A
 
 ## Build order & status
 - [x] **S0** — project scaffold (Spring + React + Postgres + Redis + Docker + CI; gauntlet green on empty) ✅
-- [ ] **S1** — domain layer (models, enums, ports, typed IDs, FilterCriteria) + unit tests
+- [x] **S1** — domain layer (models, enums, ports, typed IDs, FilterCriteria) + unit tests ✅
 - [ ] **S2** — persistence (Flyway: company, posting, job_state, filter_profile, app_user) + Testcontainers
 - [ ] **S3** — ATS adapters (Greenhouse → Lever → Ashby), normalize → Posting (incl. description/salary/type) + fixture parser tests
 - [ ] **S4** — agent loop (scheduler + Redis lock + PollingService + DedupService + catch-time); measure poll timing
@@ -52,6 +52,16 @@ Branch `s0-scaffold`, granular green commits, merged to `main --no-ff`. Full gau
 - **Infra note:** host ports 5432/6379 collide with the separate `tassist` stack; tassist was **stopped** to free them (restart with `docker compose up -d` in that project when needed).
 - **Next:** S1 — domain layer.
 
+### 2026 — Session 2: S1 domain layer (COMPLETE)
+Branch `s1-domain`, granular green commits, merged to `main --no-ff`. Pure domain — **zero framework imports** (verified mechanically: only `java.*` + `com.watchdog.domain.*`). 35 tests green (`mvn clean verify`), jar packaged.
+- **S1.1** `bba00d9` — enums (`AtsSource`, `JobState`, `SponsorshipSignal`, `EmploymentType`, `Seniority`, `RemoteType` with `ANY`=no-preference) + typed IDs (`CompanyId`/`PostingId`/`JobStateId`/`FilterProfileId`/`UserId` — UUID-wrapping records, `generate()` domain-minted, value equality, null-rejecting). 6 tests.
+- **S1.2** `e8df233` — models: `Salary` (all-optional value obj, `empty()` not null), `Company` (`register()` + immutable `polledAt()`/`withActive()`), `Posting` (nullable ATS fields normalized to UNKNOWN/empty; **`catchTime()`/`catchMinutes()`** = signature stat, honest `Optional` — empty when no `postedAt`, clamped to 0 on clock skew, never faked per §8.4; `rawJson` kept), `JobStateRecord` (`transitionTo()` stamps `appliedAt` on APPLIED, preserves on re-apply). 19 tests.
+- **S1.3** `cf56b16` — `FilterCriteria` (builder value obj over every §5 dim; `all()`=match-all; clock-free time filters) + `PostingMatcher` (pure predicate, caller passes `now`). Role kw→title only; include kw→title+description AND; exclude→neither; location/remote/employment/salary-floor(top-of-band + include-unknown toggle)/sponsorship/postedWithin/absolute-window. Deliberately excludes seniorities (needs S6 parser), sources (Company attr), statesToShow (per-user) → resolved at S6/S7 query layer, no silently-ignored constraints. 33 tests.
+- **S1.4** `79bcfba` — ports: out — `JobSourcePort` (per-ATS fetch, `source()` routing), `PostingRepository` (dedup by natural key `(companyId, atsPostingId)` §8.3), `CompanyRepository` (`findActive()` work list), `JobStateRepository`; in — `PollingUseCase.runOnce()` + `PollCycleResult` (polled/failed/new + `Optional` median catch-time). Split persistence into per-aggregate repos vs spec's single `JobRepository` (focused contracts; naming refinement only).
+- **S1.5** — full gauntlet green (35 tests), BUILD_LOG updated, merged to `main`.
+- **Decisions (spec-impl, no new D#):** typed IDs wrap **UUID** (domain-generated); matching = **pure predicate in domain**, S6 orchestrates.
+- **Next:** S2 — persistence (Flyway + repos + Testcontainers). Note: this is where the Watchdog Postgres/Redis stack + Testcontainers come alive; tassist still stopped.
+
 ---
 
 ## Environment gotchas (append as discovered)
@@ -59,7 +69,7 @@ Branch `s0-scaffold`, granular green commits, merged to `main --no-ff`. Full gau
 - `export JAVA_HOME=.../temurin-21.jdk/.../Home` before mvn. Frontend: `export PATH="$HOME/.nvm/versions/node/v20.20.1/bin:$PATH"` + `unset NODE_ENV` before npm.
 - Source `.env` before backend; never commit secrets.
 - Long processes: `nohup` + poll the log. No `timeout` on macOS; kill by port (`lsof -ti:PORT | xargs kill -9`). **`docker compose up` can hang the MCP call even as it succeeds — fire with `nohup` + poll, and check `docker ps` state before re-running.**
-- Background `git push` can lag/lose cwd — verify `git ls-remote` vs local HEAD; retry in foreground.
+- Background `git push` can lag/lose cwd — verify `git ls-remote` vs local HEAD; retry in foreground. **Confirmed fix: push synchronously with explicit redirect — `git push origin BR:BR > /tmp/push.log 2>&1; echo exit=$?` — the backgrounded `git push -u &` form silently fails to land the ref.**
 - **Spring Boot 4.x is modular (breaking vs 3.x):** `spring-boot-starter-web` → `spring-boot-starter-webmvc`; `@WebMvcTest` moved to `org.springframework.boot.webmvc.test.autoconfigure` and needs `spring-boot-starter-webmvc-test` (not transitive); `@MockBean` removed → use `@MockitoBean`; Flyway needs `spring-boot-starter-flyway` + `flyway-database-postgresql` (raw `flyway-core` silently no-ops).
 - **Testcontainers 2.x renamed modules:** `testcontainers-junit-jupiter` / `testcontainers-postgresql` (old `junit-jupiter` / `postgresql` artifact IDs gone). BOM import needs explicit version in dependencyManagement.
 - **Frontend toolchain (current create-vite):** ships Vite 8 / React 19.2 / TS 6, and **oxlint** as the default linter (not ESLint). Tailwind v4 is CSS-first: no `tailwind.config.js`, no PostCSS config.
