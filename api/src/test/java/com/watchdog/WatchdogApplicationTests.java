@@ -1,17 +1,13 @@
 package com.watchdog;
 
+import com.watchdog.support.PostgresIntegrationTest;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
 /**
- * Verifies the Spring context loads cleanly on the empty scaffold.
- * Runs under the 'test' profile, which excludes datasource auto-config
- * (no live DB in S0 / CI).
+ * Verifies the full Spring context loads cleanly against a real Postgres
+ * container (via {@link PostgresIntegrationTest}) with Flyway applied.
  */
-@SpringBootTest
-@ActiveProfiles("test")
-class WatchdogApplicationTests {
+class WatchdogApplicationTests extends PostgresIntegrationTest {
 
     @Test
     void contextLoads() {
