@@ -71,6 +71,11 @@ class PostingRepositoryAdapter implements PostingRepository {
                 .toList();
     }
 
+    @Override
+    public int deleteStalePostedBefore(java.time.Instant cutoff) {
+        return jdbc.deleteStalePostedBefore(cutoff);
+    }
+
     // --- mapping ---
 
     private static PostingRow toRow(Posting p, boolean isNew) {

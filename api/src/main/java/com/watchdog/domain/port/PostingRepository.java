@@ -46,4 +46,11 @@ public interface PostingRepository {
      * DB-derived). Caller passes the start-of-day instant.
      */
     List<Posting> findSeenSince(java.time.Instant since);
+
+    /**
+     * Delete postings posted before {@code cutoff} that no user has acted on — i.e. that
+     * have no {@code job_state} row (D-WD18: protect saved/applied/hidden). Returns the
+     * number deleted. Keeps the DB fresh without losing anything the user chose to track.
+     */
+    int deleteStalePostedBefore(java.time.Instant cutoff);
 }

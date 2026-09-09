@@ -62,6 +62,7 @@ class JobStateServiceTest {
         @Override public List<Posting> findByCompany(CompanyId c) { return List.of(); }
         @Override public List<Posting> findRecent(int limit) { return List.of(); }
         @Override public List<Posting> findSeenSince(java.time.Instant since) { return List.of(); }
+        @Override public int deleteStalePostedBefore(java.time.Instant cutoff) { return 0; }
     }
 
     private PostingId seedPosting() {

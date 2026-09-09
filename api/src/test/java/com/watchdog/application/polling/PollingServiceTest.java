@@ -62,6 +62,7 @@ class PollingServiceTest {
         @Override public List<Posting> findSeenSince(Instant since) {
             return saved.stream().filter(p -> !p.firstSeenAt().isBefore(since)).toList();
         }
+        @Override public int deleteStalePostedBefore(Instant cutoff) { return 0; }
     }
 
     private Posting posting(CompanyId companyId, String atsId, Instant postedAt) {

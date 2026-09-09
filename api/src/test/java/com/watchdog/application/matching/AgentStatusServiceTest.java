@@ -57,6 +57,7 @@ class AgentStatusServiceTest {
         @Override public List<Posting> findSeenSince(Instant since) {
             return store.stream().filter(p -> !p.firstSeenAt().isBefore(since)).toList();
         }
+        @Override public int deleteStalePostedBefore(Instant cutoff) { return 0; }
     }
 
     private Company companyPolledAt(AtsSource source, Instant polledAt) {

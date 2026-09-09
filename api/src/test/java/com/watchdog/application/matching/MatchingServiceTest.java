@@ -58,6 +58,7 @@ class MatchingServiceTest {
         @Override public List<Posting> findSeenSince(java.time.Instant since) {
             return store.stream().filter(p -> !p.firstSeenAt().isBefore(since)).toList();
         }
+        @Override public int deleteStalePostedBefore(java.time.Instant cutoff) { return 0; }
     }
 
     private static class FakeCompanyRepo implements CompanyRepository {
