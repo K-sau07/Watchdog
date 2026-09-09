@@ -37,24 +37,44 @@ public class PollingService implements PollingUseCase {
     private final CompanyRepository companies;
     private final PostingRepository postings;
     private final Clock clock;
+    private final StaggerDelay backgroundStagger;
 
     public PollingService(AtsSourceRouter router, CompanyRepository companies,
-                          PostingRepository postings, Clock clock) {
+                          PostingRepository postings, Clock clock,
+                          @org.springframework.beans.factory.annotation.Value("${watchdog.polling.stagger-min-ms:3000}") long staggerMinMs,
+                          @org.springframework.beans.factory.annotation.Value("${watchdog.polling.stagger-max-ms:15000}") long staggerMaxMs) {
         this.router = router;
         this.companies = companies;
         this.postings = postings;
         this.clock = clock;
+        this.backgroundStagger = StaggerDelay.jitter(
+                staggerMinMs, staggerMaxMs, java.util.concurrent.ThreadLocalRandom.current());
     }
 
     @Override
     public PollCycleResult runOnce() {
+        // No stagger — on-demand refresh (one user, one click) isn't a burst.
+        return runCycle(StaggerDelay.none());
+    }
+
+    @Override
+    public PollCycleResult runStaggered() {
+        return runCycle(backgroundStagger);
+    }
+
+    private PollCycleResult runCycle(StaggerDelay delay) {
         Instant startedAt = Instant.now(clock);
         List<Company> active = companies.findActive();
         int polled = 0;
         int failed = 0;
         List<Posting> newlyPersisted = new ArrayList<>();
 
+        boolean first = true;
         for (Company company : active) {
+            if (!first) {
+                delay.pause(); // spread requests over time (D-WD20); no-op when not staggering
+            }
+            first = false;
             try {
                 newlyPersisted.addAll(pollCompany(company));
                 polled++;
