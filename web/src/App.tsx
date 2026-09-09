@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { EMPTY_FILTER, toQueryString, activeCount, type FilterState } from './lib/filters'
-import { usePostings, useSetJobState } from './features/feed/hooks'
+import { usePostings, useSetJobState, flattenPages } from './features/feed/hooks'
 import { FeedList } from './features/feed/FeedList'
 import { FilterRail } from './features/filters/FilterRail'
 import { AgentStatusBar } from './features/status/AgentStatusBar'
@@ -9,9 +9,9 @@ import { medianLabel } from './features/status/statusFormat'
 import type { JobState } from './lib/api'
 
 function App() {
-  // Default view: roles posted this week, so stale backfill never clutters the first screen.
-  // Widen via the "posted within" filter anytime.
-  const [filter, setFilter] = useState<FilterState>({ ...EMPTY_FILTER, postedWithin: 'week' })
+  // Default view: US roles posted this week, so stale/foreign backfill never clutters the
+  // first screen. Widen via the filter rail (uncheck "United States only" / "posted within").
+  const [filter, setFilter] = useState<FilterState>({ ...EMPTY_FILTER, postedWithin: 'week', usOnly: true })
   const queryString = useMemo(() => toQueryString(filter), [filter])
 
   const feed = usePostings(queryString)
@@ -19,19 +19,19 @@ function App() {
   const status = useAgentStatus()
   const nowMs = useNowMs()
 
-  const postings = feed.data?.items ?? []
+  const postings = useMemo(() => flattenPages(feed.data?.pages), [feed.data])
 
   // Track which ids are newly present since last render → play the arrival pulse once.
   const seenIds = useRef<Set<string>>(new Set())
   const [freshIds, setFreshIds] = useState<ReadonlySet<string>>(new Set())
   useEffect(() => {
-    const incoming = new Set((feed.data?.items ?? []).map((p) => p.id))
+    const incoming = new Set(postings.map((p) => p.id))
     const fresh = new Set<string>()
     for (const id of incoming) if (!seenIds.current.has(id)) fresh.add(id)
     // Only flag as fresh after the very first load (avoid pulsing the whole initial page).
     if (seenIds.current.size > 0 && fresh.size > 0) setFreshIds(fresh)
     seenIds.current = incoming
-  }, [feed.data])
+  }, [postings])
 
   const onState = (id: string, state: JobState) => setState.mutate({ id, state })
   const resetFilters = () => setFilter(EMPTY_FILTER)
@@ -97,6 +97,9 @@ function App() {
             onResetFilters={resetFilters}
             onRetry={() => feed.refetch()}
             freshIds={freshIds}
+            hasMore={feed.hasNextPage}
+            isFetchingMore={feed.isFetchingNextPage}
+            onLoadMore={() => feed.fetchNextPage()}
           />
         </main>
       </div>

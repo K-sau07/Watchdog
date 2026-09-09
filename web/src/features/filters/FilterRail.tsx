@@ -60,6 +60,15 @@ export function FilterRail({ value, onChange, onReset }: FilterRailProps) {
       <TagInput label="exclude keywords" placeholder="senior, clearance…" tags={value.exclude} onChange={(t) => set('exclude', t)} />
       <TagInput label="location" placeholder="new york, remote…" tags={value.location} onChange={(t) => set('location', t)} />
 
+      <div>
+        <FieldLabel>country</FieldLabel>
+        <Chip
+          label="United States only"
+          active={value.usOnly}
+          onClick={() => set('usOnly', !value.usOnly)}
+        />
+      </div>
+
       <ChipGroup label="seniority" options={SENIORITY.map((v) => ({ value: v, label: human(v) }))} selected={value.seniority} onToggle={(v) => toggle('seniority', v)} />
       <ChipGroup label="remote" options={REMOTE.map((v) => ({ value: v, label: human(v) }))} selected={value.remote} onToggle={(v) => toggle('remote', v)} />
       <ChipGroup label="type" options={EMPLOYMENT.map((v) => ({ value: v, label: human(v) }))} selected={value.employmentType} onToggle={(v) => toggle('employmentType', v)} />

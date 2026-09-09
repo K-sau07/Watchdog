@@ -20,7 +20,7 @@ class PostingQueryMapperTest {
     /** All-null params → match-everything criteria. */
     private PostingQueryParams empty() {
         return new PostingQueryParams(null, null, null, null, null, null, null, null,
-                null, null, null, null, null, null, null, null, null);
+                null, null, null, null, null, null, null, null, null, null);
     }
 
     @Test
@@ -37,7 +37,7 @@ class PostingQueryMapperTest {
     void splitsCommaListsAndTrims() {
         PostingQueryParams p = new PostingQueryParams(
                 "new grad, swe ", "python, go", "senior", "new york, remote",
-                null, null, null, null, null, null, null, null, null, null, null, null, null);
+                null, null, null, null, null, null, null, null, null, null, null, null, null, null);
         FilterCriteria c = PostingQueryMapper.toCriteria(p);
         assertThat(c.roleKeywords()).containsExactly("new grad", "swe");
         assertThat(c.includeKeywords()).containsExactly("python", "go");
@@ -49,7 +49,7 @@ class PostingQueryMapperTest {
     void parsesEnumSetsCaseInsensitively() {
         PostingQueryParams p = new PostingQueryParams(
                 null, null, null, null, "new_grad,JUNIOR", "remote", "full_time,internship",
-                "greenhouse,LEVER", "new,saved", null, null, null, null, null, null, null, null);
+                "greenhouse,LEVER", "new,saved", null, null, null, null, null, null, null, null, null);
         FilterCriteria c = PostingQueryMapper.toCriteria(p);
         assertThat(c.seniorities()).containsExactlyInAnyOrder(Seniority.NEW_GRAD, Seniority.JUNIOR);
         assertThat(c.remoteTypes()).containsExactly(RemoteType.REMOTE);
@@ -63,7 +63,7 @@ class PostingQueryMapperTest {
     void invalidEnumRaisesBadFilterParam() {
         PostingQueryParams p = new PostingQueryParams(
                 null, null, null, null, "wizard", null, null, null, null, null, null, null,
-                null, null, null, null, null);
+                null, null, null, null, null, null);
         Throwable t = catchThrowable(() -> PostingQueryMapper.toCriteria(p));
         assertThat(t).isInstanceOf(PostingQueryMapper.BadFilterParam.class)
                 .hasMessageContaining("seniority");
@@ -73,7 +73,7 @@ class PostingQueryMapperTest {
     void parsesSalaryAndSponsorship() {
         PostingQueryParams p = new PostingQueryParams(
                 null, null, null, null, null, null, null, null, null,
-                "130000", false, "require_offered", null, null, null, null, null);
+                "130000", false, null, "require_offered", null, null, null, null, null);
         FilterCriteria c = PostingQueryMapper.toCriteria(p);
         assertThat(c.salaryMin()).isEqualByComparingTo(new BigDecimal("130000"));
         assertThat(c.includeUnknownSalary()).isFalse();
@@ -98,7 +98,7 @@ class PostingQueryMapperTest {
     @Test
     void parsesIsoDateRange() {
         PostingQueryParams p = new PostingQueryParams(
-                null, null, null, null, null, null, null, null, null, null, null, null, null,
+                null, null, null, null, null, null, null, null, null, null, null, null, null, null,
                 "2026-09-01T00:00:00Z", "2026-09-08T23:59:59Z", null, null);
         FilterCriteria c = PostingQueryMapper.toCriteria(p);
         assertThat(c.seenFrom()).isEqualTo(Instant.parse("2026-09-01T00:00:00Z"));
@@ -108,7 +108,7 @@ class PostingQueryMapperTest {
     @Test
     void invalidDateRaises() {
         PostingQueryParams p = new PostingQueryParams(
-                null, null, null, null, null, null, null, null, null, null, null, null, null,
+                null, null, null, null, null, null, null, null, null, null, null, null, null, null,
                 "last-tuesday", null, null, null);
         Throwable t = catchThrowable(() -> PostingQueryMapper.toCriteria(p));
         assertThat(t).isInstanceOf(PostingQueryMapper.BadFilterParam.class)
@@ -122,14 +122,14 @@ class PostingQueryMapperTest {
 
         PostingQueryParams big = new PostingQueryParams(
                 null, null, null, null, null, null, null, null, null, null, null, null, null,
-                null, null, 3, 5000);
+                null, null, null, 3, 5000);
         assertThat(big.pageOrDefault()).isEqualTo(3);
         assertThat(big.sizeOrDefault()).isEqualTo(PostingQueryParams.MAX_SIZE); // clamped
     }
 
     private FilterCriteria criteriaWithPostedWithin(String token) {
         PostingQueryParams p = new PostingQueryParams(
-                null, null, null, null, null, null, null, null, null, null, null, null,
+                null, null, null, null, null, null, null, null, null, null, null, null, null,
                 token, null, null, null, null);
         return PostingQueryMapper.toCriteria(p);
     }

@@ -1,5 +1,6 @@
 import type { PostingSummary, JobState } from '../../lib/api'
-import { JobCard } from './JobCard'
+import { groupByCompany } from '../../lib/grouping'
+import { CompanySection } from './CompanySection'
 
 export interface FeedListProps {
   postings: PostingSummary[]
@@ -12,6 +13,10 @@ export interface FeedListProps {
   onRetry: () => void
   /** IDs that just arrived this refetch — play the one-time pulse (bible §6). */
   freshIds?: ReadonlySet<string>
+  /** Pagination (D-WD13): more pages available + how to request the next. */
+  hasMore: boolean
+  isFetchingMore: boolean
+  onLoadMore: () => void
 }
 
 export function FeedList({
@@ -23,6 +28,9 @@ export function FeedList({
   onResetFilters,
   onRetry,
   freshIds,
+  hasMore,
+  isFetchingMore,
+  onLoadMore,
 }: FeedListProps) {
   if (isError) {
     return (
@@ -71,16 +79,26 @@ export function FeedList({
     )
   }
 
+  const groups = groupByCompany(postings)
+
   return (
     <div className="flex flex-col gap-2.5">
-      {postings.map((p) => (
-        <JobCard
-          key={p.id}
-          posting={p}
-          onState={(state) => onState(p.id, state)}
-          justArrived={freshIds?.has(p.id) ?? false}
-        />
+      {groups.map((g) => (
+        <CompanySection key={g.company} group={g} onState={onState} freshIds={freshIds} />
       ))}
+
+      {hasMore ? (
+        <button
+          type="button"
+          onClick={onLoadMore}
+          disabled={isFetchingMore}
+          className="mt-2 self-center rounded border border-line px-5 py-2 text-[13px] text-text-mid transition-colors hover:bg-card-hover disabled:opacity-50"
+        >
+          {isFetchingMore ? 'loading…' : 'load more'}
+        </button>
+      ) : (
+        <p className="mt-2 text-center text-[12px] text-text-lo">that's everything matching your filters</p>
+      )}
     </div>
   )
 }

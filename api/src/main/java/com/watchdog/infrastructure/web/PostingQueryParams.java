@@ -22,6 +22,7 @@ public record PostingQueryParams(
         String state,
         String salaryMin,
         Boolean includeUnknownSalary,
+        Boolean usOnly,
         String sponsorship,
         String postedWithin,
         String dateFrom,

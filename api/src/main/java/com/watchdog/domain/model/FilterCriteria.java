@@ -33,7 +33,8 @@ public record FilterCriteria(
         Set<JobState> statesToShow,       // empty = any (feed usually hides HIDDEN)
         java.time.Duration postedWithin,  // null = no relative window
         Instant seenFrom,                 // null = no lower bound
-        Instant seenTo                    // null = no upper bound
+        Instant seenTo,                   // null = no upper bound
+        boolean usOnly                    // true = keep only US locations (D-WD17, inclusive)
 ) {
 
     /** Sponsorship filter preference (distinct from a posting's SponsorshipSignal). */
@@ -69,6 +70,7 @@ public record FilterCriteria(
         private java.time.Duration postedWithin = null;
         private Instant seenFrom = null;
         private Instant seenTo = null;
+        private boolean usOnly = false;
 
         public Builder roleKeywords(List<String> v) { this.roleKeywords = safe(v); return this; }
         public Builder includeKeywords(List<String> v) { this.includeKeywords = safe(v); return this; }
@@ -85,12 +87,13 @@ public record FilterCriteria(
         public Builder postedWithin(java.time.Duration v) { this.postedWithin = v; return this; }
         public Builder seenFrom(Instant v) { this.seenFrom = v; return this; }
         public Builder seenTo(Instant v) { this.seenTo = v; return this; }
+        public Builder usOnly(boolean v) { this.usOnly = v; return this; }
 
         public FilterCriteria build() {
             return new FilterCriteria(
                     roleKeywords, includeKeywords, excludeKeywords, seniorities, remoteTypes,
                     locations, employmentTypes, salaryMin, includeUnknownSalary, sponsorshipPref,
-                    sources, statesToShow, postedWithin, seenFrom, seenTo);
+                    sources, statesToShow, postedWithin, seenFrom, seenTo, usOnly);
         }
 
         private static List<String> safe(List<String> v) { return v == null ? List.of() : List.copyOf(v); }

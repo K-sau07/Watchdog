@@ -20,6 +20,9 @@ const base = {
   onState: noop,
   onResetFilters: noop,
   onRetry: noop,
+  hasMore: false,
+  isFetchingMore: false,
+  onLoadMore: noop,
 }
 
 describe('FeedList', () => {
@@ -55,5 +58,33 @@ describe('FeedList', () => {
     expect(screen.getByRole('heading', { name: /software engineer/i })).toBeInTheDocument()
     fireEvent.click(screen.getByText('save'))
     expect(onState).toHaveBeenCalledWith('p1', 'SAVED')
+  })
+
+  it('groups multiple roles from one company into an expandable section', () => {
+    const roles = [
+      { ...posting, id: 'a', title: 'Backend Engineer' },
+      { ...posting, id: 'b', title: 'Frontend Engineer' },
+    ]
+    render(<FeedList {...base} postings={roles} />)
+    // Collapsed: section header shows the company + count, roles hidden.
+    expect(screen.getByText('Ramp')).toBeInTheDocument()
+    expect(screen.getByText('2 roles')).toBeInTheDocument()
+    expect(screen.queryByText('Backend Engineer')).not.toBeInTheDocument()
+    // Expand → roles appear.
+    fireEvent.click(screen.getByRole('button', { name: /Ramp/i }))
+    expect(screen.getByText('Backend Engineer')).toBeInTheDocument()
+    expect(screen.getByText('Frontend Engineer')).toBeInTheDocument()
+  })
+
+  it('shows load more when there are more pages and fires it', () => {
+    const onLoadMore = vi.fn()
+    render(<FeedList {...base} postings={[posting]} hasMore onLoadMore={onLoadMore} />)
+    fireEvent.click(screen.getByText('load more'))
+    expect(onLoadMore).toHaveBeenCalledOnce()
+  })
+
+  it('shows the end-of-results note when no more pages', () => {
+    render(<FeedList {...base} postings={[posting]} hasMore={false} />)
+    expect(screen.getByText(/that's everything matching/i)).toBeInTheDocument()
   })
 })
