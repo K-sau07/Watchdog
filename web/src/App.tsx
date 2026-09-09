@@ -4,7 +4,7 @@ import { usePostings, useSetJobState, flattenPages } from './features/feed/hooks
 import { FeedList } from './features/feed/FeedList'
 import { FilterRail } from './features/filters/FilterRail'
 import { AgentStatusBar } from './features/status/AgentStatusBar'
-import { useAgentStatus, useNowMs } from './features/status/hooks'
+import { useAgentStatus, useNowMs, useRefreshPoll } from './features/status/hooks'
 import { medianLabel } from './features/status/statusFormat'
 import type { JobState } from './lib/api'
 
@@ -18,6 +18,22 @@ function App() {
   const setState = useSetJobState(queryString)
   const status = useAgentStatus()
   const nowMs = useNowMs()
+
+  // On-demand refresh (D-WD19) with a cooldown surfaced from the 429 response.
+  const refresh = useRefreshPoll()
+  const [cooldownSeconds, setCooldownSeconds] = useState<number | null>(null)
+  const doRefresh = () => {
+    refresh.mutate(undefined, {
+      onSuccess: (r) => {
+        if (r.status === 'cooldown' && r.retryAfterSeconds) setCooldownSeconds(r.retryAfterSeconds)
+      },
+    })
+  }
+  useEffect(() => {
+    if (cooldownSeconds === null || cooldownSeconds <= 0) return
+    const id = setTimeout(() => setCooldownSeconds((s) => (s === null ? null : s - 1)), 1000)
+    return () => clearTimeout(id)
+  }, [cooldownSeconds])
 
   const postings = useMemo(() => flattenPages(feed.data?.pages), [feed.data])
 
@@ -41,7 +57,14 @@ function App() {
 
   return (
     <div className="min-h-screen bg-void text-text-hi">
-      <AgentStatusBar status={status.data} isError={status.isError} nowMs={nowMs} />
+      <AgentStatusBar
+        status={status.data}
+        isError={status.isError}
+        nowMs={nowMs}
+        onRefresh={doRefresh}
+        isRefreshing={refresh.isPending}
+        cooldownSeconds={cooldownSeconds}
+      />
 
       {/* Mobile-only: a bar to open the filter drawer (rail is pinned on desktop). */}
       <div className="sticky top-[49px] z-20 flex items-center gap-3 border-b border-line bg-void px-4 py-2 md:hidden">

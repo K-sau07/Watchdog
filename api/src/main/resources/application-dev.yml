@@ -14,4 +14,4 @@ spring:
 watchdog:
   polling:
     enabled: true
-    interval-ms: 120000   # D-WD2: 2-minute poll cycle
+    interval-ms: 3600000  # D-WD19: hourly background poll (was 2min) to avoid ATS bot-blocks; on-demand refresh covers active hunting

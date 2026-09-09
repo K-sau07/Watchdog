@@ -2,6 +2,7 @@ package com.watchdog.infrastructure.web;
 
 import com.watchdog.application.matching.AgentStatusService;
 import com.watchdog.application.matching.AgentStatusService.AgentStatus;
+import com.watchdog.application.polling.OnDemandPollService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -14,6 +15,7 @@ import java.util.Optional;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -25,6 +27,9 @@ class AgentStatusControllerTest {
 
     @MockitoBean
     private AgentStatusService agentStatus;
+
+    @MockitoBean
+    private OnDemandPollService onDemandPoll;
 
     private static final Instant NOW = Instant.parse("2026-09-08T12:00:00Z");
 
@@ -53,5 +58,28 @@ class AgentStatusControllerTest {
                 .andExpect(jsonPath("$.lastPoll").doesNotExist())
                 .andExpect(jsonPath("$.nextPoll").doesNotExist())
                 .andExpect(jsonPath("$.medianCatchMinutesToday").doesNotExist());
+    }
+
+    @Test
+    void pollReturns200WithCountsWhenItRuns() throws Exception {
+        when(onDemandPoll.refreshNow())
+                .thenReturn(new OnDemandPollService.Result.Ran(104, 7));
+
+        mockMvc.perform(post("/api/agent/poll"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("polled"))
+                .andExpect(jsonPath("$.companiesPolled").value(104))
+                .andExpect(jsonPath("$.newPostings").value(7));
+    }
+
+    @Test
+    void pollReturns429WhenCoolingDown() throws Exception {
+        when(onDemandPoll.refreshNow())
+                .thenReturn(new OnDemandPollService.Result.CoolingDown(90));
+
+        mockMvc.perform(post("/api/agent/poll"))
+                .andExpect(status().isTooManyRequests())
+                .andExpect(jsonPath("$.status").value("cooldown"))
+                .andExpect(jsonPath("$.retryAfterSeconds").value(90));
     }
 }
