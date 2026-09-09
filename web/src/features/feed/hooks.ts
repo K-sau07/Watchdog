@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   fetchPostings,
   setJobState,
@@ -9,22 +9,37 @@ import {
 
 /** Feed refetch cadence — a live radar feel without hammering (bible §6 heartbeat). */
 const FEED_POLL_MS = 30_000
+const PAGE_SIZE = 25
 
-/** The postings feed for a given filter query string. Auto-refetches to stay live. */
+/**
+ * The postings feed for a filter query, paginated with "load more" (D-WD13) via
+ * useInfiniteQuery. Pages accumulate; fetchNextPage appends the next 25. The first page
+ * auto-refetches on the poll cadence to stay live.
+ */
 export function usePostings(queryString: string) {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: ['postings', queryString],
-    queryFn: () => fetchPostings(queryString),
+    queryFn: ({ pageParam }) => {
+      const sep = queryString ? '&' : ''
+      return fetchPostings(`${queryString}${sep}page=${pageParam}&size=${PAGE_SIZE}`)
+    },
+    initialPageParam: 0,
+    getNextPageParam: (last: PageResponse<PostingSummary>) =>
+      last.page + 1 < last.totalPages ? last.page + 1 : undefined,
     refetchInterval: FEED_POLL_MS,
-    placeholderData: (prev) => prev, // keep the old page visible while refetching
   })
 }
 
+/** Flatten accumulated pages into a single postings list. */
+export function flattenPages(
+  pages: PageResponse<PostingSummary>[] | undefined,
+): PostingSummary[] {
+  return pages ? pages.flatMap((p) => p.items) : []
+}
+
 /**
- * Job-state mutation (save/applied/hide) with optimistic UI: HIDDEN removes the card
- * from every cached feed page immediately; other states update in place. Rolls back on
- * error. Verbs stay consistent (bible §7): the action that says "applied" produces an
- * applied state.
+ * Job-state mutation (save/applied/hide). HIDDEN optimistically removes the card from
+ * every accumulated page; other states are reconciled on settle. Rolls back on error.
  */
 export function useSetJobState(queryString: string) {
   const qc = useQueryClient()
@@ -36,13 +51,16 @@ export function useSetJobState(queryString: string) {
 
     onMutate: async ({ id, state }) => {
       await qc.cancelQueries({ queryKey: key })
-      const prev = qc.getQueryData<PageResponse<PostingSummary>>(key)
-      if (prev) {
-        const next: PageResponse<PostingSummary> =
-          state === 'HIDDEN'
-            ? { ...prev, items: prev.items.filter((p) => p.id !== id), totalMatched: Math.max(0, prev.totalMatched - 1) }
-            : prev // non-hide states don't change feed membership here
-        qc.setQueryData(key, next)
+      const prev = qc.getQueryData<{ pages: PageResponse<PostingSummary>[]; pageParams: unknown[] }>(key)
+      if (prev && state === 'HIDDEN') {
+        qc.setQueryData(key, {
+          ...prev,
+          pages: prev.pages.map((pg) => ({
+            ...pg,
+            items: pg.items.filter((p) => p.id !== id),
+            totalMatched: Math.max(0, pg.totalMatched - 1),
+          })),
+        })
       }
       return { prev }
     },
