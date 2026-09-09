@@ -42,7 +42,7 @@ function App() {
       <AgentStatusBar status={status.data} isError={status.isError} nowMs={nowMs} />
 
       {/* Mobile-only: a bar to open the filter drawer (rail is pinned on desktop). */}
-      <div className="flex items-center gap-3 border-b border-line px-4 py-2 md:hidden">
+      <div className="sticky top-[49px] z-20 flex items-center gap-3 border-b border-line bg-void px-4 py-2 md:hidden">
         <button
           type="button"
           onClick={() => setRailOpen(true)}
@@ -53,8 +53,8 @@ function App() {
       </div>
 
       <div className="flex flex-col md:flex-row">
-        {/* Desktop: static rail. */}
-        <div className="hidden md:block">
+        {/* Desktop: rail sticks under the agent bar with its own scroll. */}
+        <div className="hidden md:block md:sticky md:top-[49px] md:h-[calc(100vh-49px)] md:shrink-0 md:overflow-y-auto">
           <FilterRail value={filter} onChange={setFilter} onReset={resetFilters} />
         </div>
 

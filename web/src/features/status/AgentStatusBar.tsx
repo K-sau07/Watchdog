@@ -16,7 +16,7 @@ export function AgentStatusBar({ status, isError, nowMs }: AgentStatusBarProps) 
   const live = !isError && status !== undefined
   return (
     <header
-      className="flex flex-wrap items-center gap-x-6 gap-y-1 border-b border-line bg-surface px-5 py-3"
+      className="sticky top-0 z-30 flex flex-wrap items-center gap-x-6 gap-y-1 border-b border-line bg-surface px-5 py-3"
       style={{ backgroundImage: 'linear-gradient(var(--color-line) 1px, transparent 1px)', backgroundSize: '100% 28px' }}
     >
       <span className="font-display text-[18px] font-semibold tracking-tight text-text-hi">
