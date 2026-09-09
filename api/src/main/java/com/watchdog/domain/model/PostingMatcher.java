@@ -98,11 +98,15 @@ public final class PostingMatcher {
         };
     }
 
-    // --- postedWithin: firstSeenAt within [now - window, now]; needs a window ---
+    // --- postedWithin: postedAt within [now - window, now]; needs a window ---
+    // Uses the ATS post date (what the user means by "posted within"), NOT firstSeenAt.
+    // A posting with no known postedAt is excluded when a window is set — we can't confirm
+    // it's recent, and claiming so would be dishonest (spec §8.4).
     private static boolean matchesPostedWithin(Posting p, Duration window, Instant now) {
         if (window == null) return true;
+        if (p.postedAt() == null) return false;
         Instant cutoff = now.minus(window);
-        return !p.firstSeenAt().isBefore(cutoff);
+        return !p.postedAt().isBefore(cutoff);
     }
 
     // --- absolute seen window on firstSeenAt ---

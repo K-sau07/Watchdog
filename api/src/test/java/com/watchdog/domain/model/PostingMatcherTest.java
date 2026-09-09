@@ -154,12 +154,27 @@ class PostingMatcherTest {
 
     @Test
     void postedWithinRelativeWindow() {
-        Posting old = posting("SWE", "d", "NYC", RemoteType.REMOTE, EmploymentType.FULL_TIME,
-                Salary.empty(), SponsorshipSignal.UNKNOWN, NOW.minus(Duration.ofHours(2)));
+        // postedWithin filters on the ATS post date (postedAt), not firstSeenAt.
+        Posting freshlyPosted = new Posting(
+                PostingId.generate(), CompanyId.generate(), "ats-fresh", "SWE", "NYC",
+                RemoteType.REMOTE, null, EmploymentType.FULL_TIME, Salary.empty(),
+                "https://x/y", "d", SponsorshipSignal.UNKNOWN,
+                NOW.minus(Duration.ofMinutes(10)), NOW, null); // posted 10m ago
+        Posting oldPost = new Posting(
+                PostingId.generate(), CompanyId.generate(), "ats-old", "SWE", "NYC",
+                RemoteType.REMOTE, null, EmploymentType.FULL_TIME, Salary.empty(),
+                "https://x/y", "d", SponsorshipSignal.UNKNOWN,
+                NOW.minus(Duration.ofHours(2)), NOW, null); // posted 2h ago, seen now
+        Posting unknownDate = new Posting(
+                PostingId.generate(), CompanyId.generate(), "ats-unk", "SWE", "NYC",
+                RemoteType.REMOTE, null, EmploymentType.FULL_TIME, Salary.empty(),
+                "https://x/y", "d", SponsorshipSignal.UNKNOWN,
+                null, NOW, null); // no postedAt
 
         FilterCriteria within1h = FilterCriteria.builder().postedWithin(Duration.ofHours(1)).build();
-        assertThat(PostingMatcher.matches(swe(), within1h, NOW)).isTrue();   // seen at NOW
-        assertThat(PostingMatcher.matches(old, within1h, NOW)).isFalse();    // 2h ago
+        assertThat(PostingMatcher.matches(freshlyPosted, within1h, NOW)).isTrue();  // posted 10m ago
+        assertThat(PostingMatcher.matches(oldPost, within1h, NOW)).isFalse();       // posted 2h ago
+        assertThat(PostingMatcher.matches(unknownDate, within1h, NOW)).isFalse();   // unknown → excluded
     }
 
     @Test

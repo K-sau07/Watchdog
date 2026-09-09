@@ -27,8 +27,8 @@ describe('App', () => {
 
   it('opens the mobile filter drawer and closes it', () => {
     renderApp()
-    // The mobile toggle button (distinct from the rail's own "filters" heading).
-    fireEvent.click(screen.getByRole('button', { name: /^filters$/i }))
+    // Mobile toggle shows the active-filter count (default view = "posted this week").
+    fireEvent.click(screen.getByRole('button', { name: /^filters \(\d+\)$/i }))
     const close = screen.getByRole('button', { name: /close filters/i })
     expect(close).toBeInTheDocument()
     fireEvent.click(close)
