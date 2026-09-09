@@ -9,7 +9,9 @@ import { medianLabel } from './features/status/statusFormat'
 import type { JobState } from './lib/api'
 
 function App() {
-  const [filter, setFilter] = useState<FilterState>(EMPTY_FILTER)
+  // Default view: roles posted this week, so stale backfill never clutters the first screen.
+  // Widen via the "posted within" filter anytime.
+  const [filter, setFilter] = useState<FilterState>({ ...EMPTY_FILTER, postedWithin: 'week' })
   const queryString = useMemo(() => toQueryString(filter), [filter])
 
   const feed = usePostings(queryString)

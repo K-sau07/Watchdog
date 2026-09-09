@@ -86,8 +86,13 @@ public class MatchingService {
                 .map(this::enrich)
                 .filter(m -> matchesAll(m, criteria, now, companyById))
                 .map(m -> m.withCompany(companyById.get(m.posting().companyId())))
-                .sorted(Comparator.comparing(
-                        (MatchedPosting m) -> m.posting().firstSeenAt()).reversed())
+                // Newest-actually-posted first (what the user means by "recent"). Postings
+                // with no known postedAt sort last, then by firstSeenAt as a tiebreaker,
+                // so unknown-date backfill never floats above genuinely-fresh roles.
+                .sorted(Comparator
+                        .comparing((MatchedPosting m) -> m.posting().postedAt(),
+                                Comparator.nullsLast(Comparator.reverseOrder()))
+                        .thenComparing(m -> m.posting().firstSeenAt(), Comparator.reverseOrder()))
                 .toList();
 
         int total = matched.size();
