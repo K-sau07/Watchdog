@@ -97,7 +97,7 @@ class PollingServiceTest {
         var port = portReturning(AtsSource.GREENHOUSE,
                 List.of(posting(co.id(), "a1", NOW.minus(Duration.ofMinutes(3))),
                         posting(co.id(), "a2", NOW.minus(Duration.ofMinutes(5)))));
-        var service = new PollingService(new AtsSourceRouter(List.of(port)), companies, postings, clock);
+        var service = new PollingService(new AtsSourceRouter(List.of(port)), companies, postings, clock, 0, 0);
 
         PollingUseCase.PollCycleResult r = service.runOnce();
         assertThat(r.newPostings()).isEqualTo(2);
@@ -118,7 +118,7 @@ class PollingServiceTest {
         var port = portReturning(AtsSource.GREENHOUSE,
                 List.of(posting(co.id(), "a1", NOW),   // dup
                         posting(co.id(), "a2", NOW)));  // new
-        var service = new PollingService(new AtsSourceRouter(List.of(port)), companies, postings, clock);
+        var service = new PollingService(new AtsSourceRouter(List.of(port)), companies, postings, clock, 0, 0);
 
         PollingUseCase.PollCycleResult r = service.runOnce();
         assertThat(r.newPostings()).isEqualTo(1); // only a2
@@ -136,7 +136,7 @@ class PollingServiceTest {
         var ghPort = portReturning(AtsSource.GREENHOUSE, List.of(posting(good.id(), "g1", NOW)));
         var leverPort = portThatFails(AtsSource.LEVER);
         var service = new PollingService(
-                new AtsSourceRouter(List.of(ghPort, leverPort)), companies, postings, clock);
+                new AtsSourceRouter(List.of(ghPort, leverPort)), companies, postings, clock, 0, 0);
 
         PollingUseCase.PollCycleResult r = service.runOnce();
         assertThat(r.companiesPolled()).isEqualTo(1);
@@ -155,7 +155,7 @@ class PollingServiceTest {
                 posting(co.id(), "a1", NOW.minus(Duration.ofMinutes(2))),
                 posting(co.id(), "a2", NOW.minus(Duration.ofMinutes(4))),
                 posting(co.id(), "a3", NOW.minus(Duration.ofMinutes(6)))));
-        var service = new PollingService(new AtsSourceRouter(List.of(port)), companies, postings, clock);
+        var service = new PollingService(new AtsSourceRouter(List.of(port)), companies, postings, clock, 0, 0);
 
         PollingUseCase.PollCycleResult r = service.runOnce();
         assertThat(r.medianCatchTime()).contains(Duration.ofMinutes(4));
@@ -169,7 +169,7 @@ class PollingServiceTest {
         companies.save(co);
         var port = portReturning(AtsSource.GREENHOUSE,
                 List.of(posting(co.id(), "a1", null))); // no postedAt
-        var service = new PollingService(new AtsSourceRouter(List.of(port)), companies, postings, clock);
+        var service = new PollingService(new AtsSourceRouter(List.of(port)), companies, postings, clock, 0, 0);
 
         assertThat(service.runOnce().medianCatchTime()).isEmpty();
     }
@@ -177,9 +177,28 @@ class PollingServiceTest {
     @Test
     void noActiveCompaniesIsANoOp() {
         var service = new PollingService(
-                new AtsSourceRouter(List.of()), new FakeCompanyRepo(), new FakePostingRepo(), clock);
+                new AtsSourceRouter(List.of()), new FakeCompanyRepo(), new FakePostingRepo(), clock, 0, 0);
         PollingUseCase.PollCycleResult r = service.runOnce();
         assertThat(r.companiesPolled()).isZero();
         assertThat(r.newPostings()).isZero();
+    }
+
+    @Test
+    void staggeredRunStillPollsEveryCompany() {
+        // Stagger must not drop or skip any board — same result as an un-staggered run.
+        FakeCompanyRepo companies = new FakeCompanyRepo();
+        FakePostingRepo postings = new FakePostingRepo();
+        Company a = Company.register("A", AtsSource.GREENHOUSE, "a");
+        Company b = Company.register("B", AtsSource.GREENHOUSE, "b");
+        companies.save(a);
+        companies.save(b);
+        var port = portReturning(AtsSource.GREENHOUSE,
+                List.of(posting(a.id(), "a1", NOW), posting(b.id(), "b1", NOW)));
+        // tiny 1ms jitter so the test stays fast but the stagger path executes
+        var service = new PollingService(new AtsSourceRouter(List.of(port)), companies, postings, clock, 1, 1);
+
+        PollingUseCase.PollCycleResult r = service.runStaggered();
+        assertThat(r.companiesPolled()).isEqualTo(2);
+        assertThat(r.companiesFailed()).isZero();
     }
 }

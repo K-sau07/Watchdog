@@ -1,6 +1,7 @@
 package com.watchdog.application.polling;
 
 import com.watchdog.domain.port.PollingUseCase;
+import com.watchdog.domain.port.PollingUseCase.PollCycleResult;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -13,9 +14,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 class OnDemandPollServiceTest {
 
     private final AtomicInteger runs = new AtomicInteger();
-    private final PollingUseCase polling = () ->
-            new PollingUseCase.PollCycleResult(Instant.now(), 10, 0,
-                    runs.incrementAndGet(), Optional.empty());
+    private final PollingUseCase polling = new PollingUseCase() {
+        @Override public PollCycleResult runOnce() {
+            return new PollCycleResult(Instant.now(), 10, 0, runs.incrementAndGet(), Optional.empty());
+        }
+        @Override public PollCycleResult runStaggered() { return runOnce(); }
+    };
 
     // A mutable clock we can advance.
     private Instant now = Instant.parse("2026-09-08T12:00:00Z");

@@ -15,8 +15,15 @@ import java.util.Optional;
  */
 public interface PollingUseCase {
 
-    /** Execute one poll cycle across all active companies. */
+    /** Execute one poll cycle across all active companies (no stagger — e.g. on-demand). */
     PollCycleResult runOnce();
+
+    /**
+     * Execute one poll cycle with the configured background jitter between board requests,
+     * so the cycle spreads requests over time instead of one burst (D-WD20). Used by the
+     * scheduler; on-demand uses {@link #runOnce()}.
+     */
+    PollCycleResult runStaggered();
 
     /**
      * Outcome of a single cycle — the raw material for the agent-status bar and the
