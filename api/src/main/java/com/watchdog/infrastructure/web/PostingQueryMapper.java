@@ -57,6 +57,9 @@ final class PostingQueryMapper {
         if (p.includeUnknownSalary() != null) {
             b.includeUnknownSalary(p.includeUnknownSalary());
         }
+        if (p.usOnly() != null) {
+            b.usOnly(p.usOnly());
+        }
         if (p.sponsorship() != null && !p.sponsorship().isBlank()) {
             b.sponsorshipPref(parseEnum(p.sponsorship(), FilterCriteria.SponsorshipPref.class, "sponsorship"));
         }

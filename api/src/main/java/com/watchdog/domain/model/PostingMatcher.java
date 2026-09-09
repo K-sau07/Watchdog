@@ -34,7 +34,14 @@ public final class PostingMatcher {
                 && matchesSalary(posting, criteria.salaryMin(), criteria.includeUnknownSalary())
                 && matchesSponsorship(posting, criteria.sponsorshipPref())
                 && matchesPostedWithin(posting, criteria.postedWithin(), now)
-                && matchesSeenWindow(posting, criteria.seenFrom(), criteria.seenTo());
+                && matchesSeenWindow(posting, criteria.seenFrom(), criteria.seenTo())
+                && matchesUsOnly(posting, criteria.usOnly());
+    }
+
+    // --- usOnly: keep only US locations (D-WD17, inclusive heuristic) ---
+    private static boolean matchesUsOnly(Posting p, boolean usOnly) {
+        if (!usOnly) return true;
+        return UsLocationClassifier.isUnitedStates(p.location());
     }
 
     // --- role: any keyword appears in the TITLE (OR) ---

@@ -39,6 +39,11 @@ describe('toQueryString', () => {
     const qs = new URLSearchParams(toQueryString({ ...EMPTY_FILTER, page: 2 }))
     expect(qs.get('page')).toBe('2')
   })
+
+  it('serializes usOnly only when true', () => {
+    expect(new URLSearchParams(toQueryString(EMPTY_FILTER)).has('usOnly')).toBe(false)
+    expect(new URLSearchParams(toQueryString({ ...EMPTY_FILTER, usOnly: true })).get('usOnly')).toBe('true')
+  })
 })
 
 describe('activeCount', () => {

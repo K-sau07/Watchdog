@@ -21,6 +21,7 @@ export interface FilterState {
   postedWithin: string | null; // token: 10m|30m|1h|today|week
   dateFrom: string | null; // ISO instant
   dateTo: string | null;
+  usOnly: boolean;
   page: number;
   size: number | null;
 }
@@ -42,6 +43,7 @@ export const EMPTY_FILTER: FilterState = {
   postedWithin: null,
   dateFrom: null,
   dateTo: null,
+  usOnly: false,
   page: 0,
   size: null,
 };
@@ -71,6 +73,7 @@ export function toQueryString(f: FilterState): string {
   if (f.postedWithin) p.set('postedWithin', f.postedWithin);
   if (f.dateFrom) p.set('dateFrom', f.dateFrom);
   if (f.dateTo) p.set('dateTo', f.dateTo);
+  if (f.usOnly) p.set('usOnly', 'true');
   if (f.page > 0) p.set('page', String(f.page));
   if (f.size !== null) p.set('size', String(f.size));
   return p.toString();
@@ -92,5 +95,6 @@ export function activeCount(f: FilterState): number {
   n += f.sponsorship ? 1 : 0;
   n += f.postedWithin ? 1 : 0;
   n += f.dateFrom || f.dateTo ? 1 : 0;
+  n += f.usOnly ? 1 : 0;
   return n;
 }
