@@ -520,6 +520,156 @@
       "name": "Sierra",
       "source": "ASHBY",
       "slug": "sierra"
+    },
+    {
+      "name": "Attentive",
+      "source": "GREENHOUSE",
+      "slug": "attentive"
+    },
+    {
+      "name": "Faire",
+      "source": "GREENHOUSE",
+      "slug": "faire"
+    },
+    {
+      "name": "ZoomInfo",
+      "source": "GREENHOUSE",
+      "slug": "zoominfo"
+    },
+    {
+      "name": "Hightouch",
+      "source": "GREENHOUSE",
+      "slug": "hightouch"
+    },
+    {
+      "name": "Observeai",
+      "source": "GREENHOUSE",
+      "slug": "observeai"
+    },
+    {
+      "name": "Cresta",
+      "source": "GREENHOUSE",
+      "slug": "cresta"
+    },
+    {
+      "name": "CircleCI",
+      "source": "GREENHOUSE",
+      "slug": "circleci"
+    },
+    {
+      "name": "Verkada",
+      "source": "GREENHOUSE",
+      "slug": "verkada"
+    },
+    {
+      "name": "Dialpad",
+      "source": "GREENHOUSE",
+      "slug": "dialpad"
+    },
+    {
+      "name": "LaunchDarkly",
+      "source": "GREENHOUSE",
+      "slug": "launchdarkly"
+    },
+    {
+      "name": "Intercom",
+      "source": "GREENHOUSE",
+      "slug": "intercom"
+    },
+    {
+      "name": "PagerDuty",
+      "source": "GREENHOUSE",
+      "slug": "pagerduty"
+    },
+    {
+      "name": "Honeycomb",
+      "source": "GREENHOUSE",
+      "slug": "honeycomb"
+    },
+    {
+      "name": "Imply",
+      "source": "GREENHOUSE",
+      "slug": "imply"
+    },
+    {
+      "name": "Algolia",
+      "source": "GREENHOUSE",
+      "slug": "algolia"
+    },
+    {
+      "name": "Yugabyte",
+      "source": "GREENHOUSE",
+      "slug": "yugabyte"
+    },
+    {
+      "name": "SingleStore",
+      "source": "GREENHOUSE",
+      "slug": "singlestore"
+    },
+    {
+      "name": "Orca",
+      "source": "GREENHOUSE",
+      "slug": "orca"
+    },
+    {
+      "name": "Chainguard",
+      "source": "GREENHOUSE",
+      "slug": "chainguard"
+    },
+    {
+      "name": "Postman",
+      "source": "GREENHOUSE",
+      "slug": "postman"
+    },
+    {
+      "name": "Grafanalabs",
+      "source": "GREENHOUSE",
+      "slug": "grafanalabs"
+    },
+    {
+      "name": "Montecarlodata",
+      "source": "ASHBY",
+      "slug": "montecarlodata"
+    },
+    {
+      "name": "Anchorage",
+      "source": "LEVER",
+      "slug": "anchorage"
+    },
+    {
+      "name": "Mintlify",
+      "source": "ASHBY",
+      "slug": "mintlify"
+    },
+    {
+      "name": "Suno",
+      "source": "ASHBY",
+      "slug": "suno"
+    },
+    {
+      "name": "Watershed",
+      "source": "ASHBY",
+      "slug": "watershed"
+    },
+    {
+      "name": "World Labs",
+      "source": "ASHBY",
+      "slug": "worldlabs"
+    },
+    {
+      "name": "Physicalintelligence",
+      "source": "ASHBY",
+      "slug": "physicalintelligence"
+    },
+    {
+      "name": "Thinking Machines",
+      "source": "ASHBY",
+      "slug": "thinkingmachines"
+    },
+    {
+      "name": "Mercor",
+      "source": "ASHBY",
+      "slug": "mercor"
     }
   ]
 }
