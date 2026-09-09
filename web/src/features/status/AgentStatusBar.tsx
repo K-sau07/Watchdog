@@ -5,14 +5,25 @@ export interface AgentStatusBarProps {
   status: AgentStatus | undefined
   isError: boolean
   nowMs: number
+  onRefresh: () => void
+  isRefreshing: boolean
+  /** Non-null when the last refresh hit the cooldown — seconds to wait. */
+  cooldownSeconds: number | null
 }
 
 /**
- * The top command bar (bible §4/§7): a live "watching" heartbeat, boards watched, and the
- * poll cadence. All numbers are real (DB-derived backend, D-WD12). Degrades honestly when
- * the agent is unreachable.
+ * The top command bar (bible §4/§7): a live "watching" heartbeat, boards watched, the
+ * poll cadence, and an on-demand refresh (D-WD19). All numbers are real (DB-derived
+ * backend, D-WD12). Degrades honestly when the agent is unreachable.
  */
-export function AgentStatusBar({ status, isError, nowMs }: AgentStatusBarProps) {
+export function AgentStatusBar({
+  status,
+  isError,
+  nowMs,
+  onRefresh,
+  isRefreshing,
+  cooldownSeconds,
+}: AgentStatusBarProps) {
   const live = !isError && status !== undefined
   return (
     <header
@@ -48,6 +59,21 @@ export function AgentStatusBar({ status, isError, nowMs }: AgentStatusBarProps) 
           </span>
         </>
       ) : null}
+
+      <button
+        type="button"
+        onClick={onRefresh}
+        disabled={isRefreshing || cooldownSeconds !== null}
+        title="Poll all boards now"
+        className={`rounded border border-line px-3 py-1 text-[13px] transition-colors hover:bg-card-hover disabled:opacity-50 ${live ? '' : 'ml-auto'}`}
+        style={{ color: 'var(--color-amber)' }}
+      >
+        {isRefreshing
+          ? 'refreshing…'
+          : cooldownSeconds !== null
+            ? `wait ${cooldownSeconds}s`
+            : '↻ refresh'}
+      </button>
     </header>
   )
 }

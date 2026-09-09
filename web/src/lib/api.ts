@@ -146,6 +146,25 @@ export function fetchAgentStatus(): Promise<AgentStatus> {
   return request<AgentStatus>('/api/agent/status');
 }
 
+/** On-demand poll result (D-WD19). */
+export interface PollResult {
+  status: 'polled' | 'cooldown';
+  companiesPolled?: number;
+  newPostings?: number;
+  retryAfterSeconds?: number;
+}
+
+/** Trigger an on-demand refresh. Resolves with 'polled' or 'cooldown' (never throws on 429). */
+export async function triggerPoll(): Promise<PollResult> {
+  const res = await fetch('/api/agent/poll', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  // 429 is an expected outcome (cooldown), not an error — parse it normally.
+  const text = await res.text();
+  return (text ? JSON.parse(text) : { status: 'polled' }) as PollResult;
+}
+
 export function fetchDefaultProfile(): Promise<FilterProfile> {
   return request<FilterProfile>('/api/filter-profiles/default');
 }

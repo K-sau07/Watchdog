@@ -25,8 +25,8 @@ public class PollScheduler {
         this.pollingUseCase = pollingUseCase;
     }
 
-    @Scheduled(fixedDelayString = "${watchdog.polling.interval-ms:120000}")
-    @SchedulerLock(name = "watchdog-poll-cycle", lockAtMostFor = "PT5M", lockAtLeastFor = "PT5S")
+    @Scheduled(fixedDelayString = "${watchdog.polling.interval-ms:3600000}")
+    @SchedulerLock(name = "watchdog-poll-cycle", lockAtMostFor = "PT10M", lockAtLeastFor = "PT5S")
     public void poll() {
         pollingUseCase.runOnce();
     }
