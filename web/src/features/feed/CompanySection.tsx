@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { JobState } from '../../lib/api'
 import type { CompanyGroup } from '../../lib/grouping'
 import { JobCard } from './JobCard'
@@ -18,8 +18,15 @@ export interface CompanySectionProps {
  */
 export function CompanySection({ group, onState, freshIds }: CompanySectionProps) {
   const hasFresh = freshIds ? group.roles.some((r) => freshIds.has(r.id)) : false
-  const [open, setOpen] = useState(false)
-  const expanded = open || hasFresh
+  // Auto-open once when a fresh role arrives, but stay fully user-controlled after —
+  // hasFresh must NOT force the section open, or the close button can't override it.
+  const [open, setOpen] = useState(hasFresh)
+  const wasFresh = useRef(hasFresh)
+  useEffect(() => {
+    if (hasFresh && !wasFresh.current) setOpen(true) // newly fresh → pop open
+    wasFresh.current = hasFresh
+  }, [hasFresh])
+  const expanded = open
 
   // Single role → just the card, no section chrome.
   if (group.roles.length === 1) {
