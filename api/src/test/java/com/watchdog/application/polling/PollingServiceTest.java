@@ -184,21 +184,31 @@ class PollingServiceTest {
     }
 
     @Test
-    void staggeredRunStillPollsEveryCompany() {
-        // Stagger must not drop or skip any board — same result as an un-staggered run.
+    void ingestFilterDropsNonSoftwareAndForeignPostings() {
         FakeCompanyRepo companies = new FakeCompanyRepo();
         FakePostingRepo postings = new FakePostingRepo();
-        Company a = Company.register("A", AtsSource.GREENHOUSE, "a");
-        Company b = Company.register("B", AtsSource.GREENHOUSE, "b");
-        companies.save(a);
-        companies.save(b);
-        var port = portReturning(AtsSource.GREENHOUSE,
-                List.of(posting(a.id(), "a1", NOW), posting(b.id(), "b1", NOW)));
-        // tiny 1ms jitter so the test stays fast but the stagger path executes
-        var service = new PollingService(new AtsSourceRouter(List.of(port)), companies, postings, clock, 1, 1);
+        Company co = Company.register("Co", AtsSource.GREENHOUSE, "co");
+        companies.save(co);
 
-        PollingUseCase.PollCycleResult r = service.runStaggered();
-        assertThat(r.companiesPolled()).isEqualTo(2);
-        assertThat(r.companiesFailed()).isZero();
+        var port = portReturning(AtsSource.GREENHOUSE, List.of(
+                titled(co.id(), "s1", "Software Engineer", "New York"),      // keep
+                titled(co.id(), "s2", "Backend Engineer", "Remote"),         // keep (ambiguous loc)
+                titled(co.id(), "n1", "Solutions Architect", "New York"),    // drop: not software
+                titled(co.id(), "n2", "Product Manager", "New York"),        // drop: not software
+                titled(co.id(), "f1", "Software Engineer", "London, UK")));  // drop: foreign
+
+        var service = new PollingService(new AtsSourceRouter(List.of(port)), companies, postings, clock, 0, 0);
+        PollingUseCase.PollCycleResult r = service.runOnce();
+
+        assertThat(r.newPostings()).isEqualTo(2); // only the two US software roles
+        assertThat(postings.saved).hasSize(2);
+        assertThat(postings.saved.stream().map(Posting::title))
+                .containsExactlyInAnyOrder("Software Engineer", "Backend Engineer");
+    }
+
+    private Posting titled(CompanyId companyId, String atsId, String title, String location) {
+        return new Posting(PostingId.generate(), companyId, atsId, title, location,
+                RemoteType.REMOTE, null, EmploymentType.FULL_TIME, Salary.empty(),
+                "https://x/y", "desc", SponsorshipSignal.UNKNOWN, NOW, NOW, null);
     }
 }

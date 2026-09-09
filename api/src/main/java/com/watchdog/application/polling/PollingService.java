@@ -2,6 +2,8 @@ package com.watchdog.application.polling;
 
 import com.watchdog.domain.model.Company;
 import com.watchdog.domain.model.Posting;
+import com.watchdog.domain.model.SoftwareRoleMatcher;
+import com.watchdog.domain.model.UsLocationClassifier;
 import com.watchdog.domain.port.CompanyRepository;
 import com.watchdog.domain.port.JobSourcePort;
 import com.watchdog.domain.port.PollingUseCase;
@@ -101,6 +103,14 @@ public class PollingService implements PollingUseCase {
 
         List<Posting> newlyPersisted = new ArrayList<>();
         for (Posting posting : fetched) {
+            // Ingest filter (D-WD23): only store the user's universe — software roles, US.
+            // The read-side FilterCriteria narrows within this coarse superset.
+            if (!SoftwareRoleMatcher.isSoftwareRole(posting.title())) {
+                continue;
+            }
+            if (!UsLocationClassifier.isUnitedStates(posting.location())) {
+                continue;
+            }
             if (!postings.existsByNaturalKey(posting.companyId(), posting.atsPostingId())) {
                 newlyPersisted.add(postings.save(posting));
             }
