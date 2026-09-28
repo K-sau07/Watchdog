@@ -2,6 +2,12 @@
 
 **A continuous agent that catches fresh job postings minutes after they go live — before the crowd.**
 
+**[Live demo →](https://watchdog-sand.vercel.app)**  ·  API: [watchdog-api-psrv.onrender.com](https://watchdog-api-psrv.onrender.com/api/health)
+
+> Hosted on free tiers: the API sleeps after ~15 minutes idle, so the first request after a
+> quiet spell takes about 50 seconds to wake it. Everything after that is fast.
+
+
 Watchdog polls company ATS boards (Greenhouse, Lever, Ashby) on a schedule, detects brand-new postings the moment they appear, filters them to exactly the roles you're hunting, and surfaces them on a cyber-futuristic radar dashboard — freshest first.
 
 The name says it: in software, a *watchdog* is a process that continuously monitors a system and acts the instant something changes. That's exactly what this is — for the job market.
