@@ -25,6 +25,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -53,6 +55,19 @@ public class MatchingService {
 
     /** Candidate window cap (D-WD10). Ample at v1 volume; revisit via measurement. */
     static final int CANDIDATE_LIMIT = 2000;
+
+    /**
+     * Enrichment cache (D-WD10 follow-up). {@link #enrich} runs three regex parsers over the
+     * full description; descriptions average ~7 KB, so re-deriving the whole candidate window
+     * on every request cost seconds per page load. Postings are insert-only — {@code
+     * PollingService} skips anything whose natural key already exists and never updates a row —
+     * so a value keyed by posting id can never go stale.
+     *
+     * <p>Bounded so retention churn cannot grow it without limit; on overflow we drop
+     * everything rather than track recency, which keeps the read path lock-free.
+     */
+    private static final int ENRICH_CACHE_MAX = 20_000;
+    private final Map<PostingId, MatchedPosting> enrichCache = new ConcurrentHashMap<>();
 
     private final PostingRepository postings;
     private final CompanyRepository companies;
@@ -83,7 +98,7 @@ public class MatchingService {
                 .collect(Collectors.toMap(Company::id, c -> c, (a, b) -> a));
 
         List<MatchedPosting> matched = postings.findRecent(CANDIDATE_LIMIT).stream()
-                .map(this::enrich)
+                .map(this::enrichCached)
                 .filter(m -> matchesAll(m, criteria, now, companyById))
                 .map(m -> m.withCompany(companyById.get(m.posting().companyId())))
                 // Newest-actually-posted first (what the user means by "recent"). Postings
@@ -109,7 +124,7 @@ public class MatchingService {
      */
     public Optional<MatchedPosting> findEnriched(PostingId id) {
         return postings.findById(id).map(p -> {
-            MatchedPosting m = enrich(p);
+            MatchedPosting m = enrichCached(p);
             return companies.findById(p.companyId())
                     .map(m::withCompany)
                     .orElse(m);
@@ -117,6 +132,20 @@ public class MatchingService {
     }
 
     // --- enrichment: fill heuristic fields the ATS didn't provide (read-time) ---
+
+    /** {@link #enrich} memoised by posting id. See {@link #ENRICH_CACHE_MAX}. */
+    private MatchedPosting enrichCached(Posting p) {
+        MatchedPosting hit = enrichCache.get(p.id());
+        if (hit != null) {
+            return hit;
+        }
+        MatchedPosting computed = enrich(p);
+        if (enrichCache.size() >= ENRICH_CACHE_MAX) {
+            enrichCache.clear();
+        }
+        enrichCache.put(p.id(), computed);
+        return computed;
+    }
 
     private MatchedPosting enrich(Posting p) {
         Seniority seniority = SeniorityParser.parse(p.title(), p.description());

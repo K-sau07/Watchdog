@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { agoLabel, countdownLabel, medianLabel } from './statusFormat'
+import { agoLabel, countdownLabel, medianLabel, hasEarlyAdvantage } from './statusFormat'
 
 const NOW = Date.parse('2026-09-08T12:00:00Z')
 
@@ -33,5 +33,23 @@ describe('medianLabel', () => {
     expect(medianLabel(0)).toBe('median catch time today · <1 min')
     expect(medianLabel(75)).toBe('median catch time today · 1 hr')
     expect(medianLabel(null)).toBe('no catches timed yet')
+  })
+
+  it('rolls up to days past 48 hours', () => {
+    expect(medianLabel(60 * 47)).toBe('median catch time today · 47 hr')
+    expect(medianLabel(60 * 48)).toBe('median catch time today · 2 days')
+    expect(medianLabel(60 * 24)).toBe('median catch time today · 24 hr')
+    expect(medianLabel(13100)).toBe('median catch time today · 9 days')
+  })
+})
+
+describe('hasEarlyAdvantage', () => {
+  it('is true only when the catch is genuinely fast', () => {
+    expect(hasEarlyAdvantage(5)).toBe(true)
+    expect(hasEarlyAdvantage(120)).toBe(true)
+    expect(hasEarlyAdvantage(121)).toBe(false)
+    // the value that shipped the false claim: 13100 min is nine days
+    expect(hasEarlyAdvantage(13100)).toBe(false)
+    expect(hasEarlyAdvantage(null)).toBe(false)
   })
 })

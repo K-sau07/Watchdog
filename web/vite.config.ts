@@ -6,10 +6,10 @@ import { defineConfig } from 'vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  // Dev: proxy API calls to the backend (running on 8090 per the S4 live-run note).
+  // Dev: proxy API calls to the backend. Port matches api/src/main/resources/application.yml.
   server: {
     proxy: {
-      '/api': 'http://localhost:8090',
+      '/api': 'http://localhost:8080',
     },
   },
   test: {

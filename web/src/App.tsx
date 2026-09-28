@@ -5,7 +5,7 @@ import { FeedList } from './features/feed/FeedList'
 import { FilterRail } from './features/filters/FilterRail'
 import { AgentStatusBar } from './features/status/AgentStatusBar'
 import { useAgentStatus, useNowMs, useRefreshPoll } from './features/status/hooks'
-import { medianLabel } from './features/status/statusFormat'
+import { medianLabel, hasEarlyAdvantage } from './features/status/statusFormat'
 import type { JobState } from './lib/api'
 
 function App() {
@@ -138,7 +138,7 @@ function HeroStat({ medianMinutes, isLive }: { medianMinutes: number | null; isL
         {big}
         {small ? <span className="ml-2 align-middle text-[15px] font-normal text-text-mid">{small}</span> : null}
       </p>
-      {isLive && medianMinutes !== null ? (
+      {isLive && hasEarlyAdvantage(medianMinutes) ? (
         <p className="mt-1 font-voice text-[15px] italic text-text-mid">
           you're seeing these before most applicants
         </p>

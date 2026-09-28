@@ -28,5 +28,20 @@ export function medianLabel(minutes: number | null): string {
   if (minutes < 1) return 'median catch time today · <1 min'
   if (minutes < 60) return `median catch time today · ${minutes} min`
   const hr = Math.floor(minutes / 60)
-  return `median catch time today · ${hr} hr`
+  // Past two days, hours stop reading as a duration — "218 hr" is noise. Roll up to days.
+  if (hr < 48) return `median catch time today · ${hr} hr`
+  const days = Math.floor(hr / 24)
+  return `median catch time today · ${days} ${days === 1 ? 'day' : 'days'}`
+}
+
+/**
+ * Is the catch time fast enough to claim an early-applicant advantage?
+ *
+ * The headline used to assert "you're seeing these before most applicants" whenever a
+ * median existed — including at 218 hr, which is nine days and the opposite of the claim.
+ */
+export const EARLY_ADVANTAGE_MAX_MINUTES = 120
+
+export function hasEarlyAdvantage(minutes: number | null): boolean {
+  return minutes !== null && minutes <= EARLY_ADVANTAGE_MAX_MINUTES
 }
