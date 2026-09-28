@@ -7,10 +7,40 @@ Watchdog polls company ATS boards (Greenhouse, Lever, Ashby) on a schedule, dete
 The name says it: in software, a *watchdog* is a process that continuously monitors a system and acts the instant something changes. That's exactly what this is — for the job market.
 
 ## Status
-🚧 Early development. Master spec in `docs/01_WATCHDOG_SPEC.md`. Built under the process in `docs/00_DEVELOPMENT_CONSTITUTION.md` (spec-first, green-gate, no slop).
+
+Working. All three ATS sources are implemented and polled on a schedule, the dashboard
+is complete, and CI is green — 203 backend tests across 40 files plus 6 frontend test
+files. Built spec-first: the master spec is `docs/01_WATCHDOG_SPEC.md`, under the
+process in `docs/00_DEVELOPMENT_CONSTITUTION.md`.
+
+## What it does
+
+- **Polls Greenhouse, Lever and Ashby** on a schedule — each has its own client and parser
+- **Detects genuinely new postings** rather than re-surfaced ones, and marks them fresh in the feed
+- **Parses what the listing doesn't state plainly** — salary range, seniority, and
+  **visa-sponsorship signal**, extracted from the title and description
+- **Filters** by role, include/exclude keywords, location, posting age and US-only
+- **Live agent status** showing whether the poller is healthy and the median catch time today
+- **Retention** — old postings are aged out on a schedule
+
+## Architecture
+
+Hexagonal: `domain` holds the model and ports, `application` the matching and status
+services, `infrastructure` the ATS adapters, persistence and web layer. Persistence is
+`JdbcTemplate` against Flyway-managed migrations rather than JPA — the queries are
+read-heavy and shaped for the feed.
+
+| | |
+|:--|:--|
+| `GET /api/postings` | the filtered feed |
+| `GET /api/agent/status` | poller health and median catch time |
+| `POST /api/agent/poll` | trigger a poll run |
+| `GET /api/filter-profiles` | saved filters |
+| `GET /health` | liveness |
 
 ## Stack
-Java 21 / Spring Boot (hexagonal) · React 19 / Vite / TypeScript / Tailwind · PostgreSQL · Redis · scheduled poller
+Java 21 · Spring Boot (hexagonal) · PostgreSQL + Flyway · scheduled poller
+React 19 · Vite · TypeScript · Tailwind
 
 ## Thesis
 The early-applicant advantage is real. By the time a role hits LinkedIn/Indeed, hundreds have applied. Watchdog reads where jobs are *born* — the company ATS — so you see them first. Speed is the product.
