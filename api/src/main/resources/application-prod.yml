@@ -11,9 +11,19 @@ spring:
       maximum-pool-size: 5
       minimum-idle: 1
       connection-timeout: 30000
+      # Set the schema on the pool rather than via currentSchema in the JDBC URL —
+      # Neon's pooled endpoint doesn't honour the URL parameter, so runtime queries
+      # fell back to public and couldn't see the tables Flyway had created.
+      schema: ${DB_SCHEMA:watchdog}
   flyway:
     enabled: true
     baseline-on-migrate: true
+    # One Neon database is shared across projects, so pin Flyway to this
+    # project's schema. Without these it ignores currentSchema and writes to
+    # public, where every service would collide.
+    schemas: ${DB_SCHEMA:watchdog}
+    default-schema: ${DB_SCHEMA:watchdog}
+    create-schemas: true
   data:
     redis:
       # Required — ShedLock uses Redis so the poll cycle runs on exactly one
