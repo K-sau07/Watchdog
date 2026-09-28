@@ -14,6 +14,13 @@ spring:
       # Set the schema on the pool rather than via currentSchema in the JDBC URL —
       # Neon's pooled endpoint doesn't honour the URL parameter, so runtime queries
       # fell back to public and couldn't see the tables Flyway had created.
+      #
+      # DB_URL must be Neon's DIRECT endpoint, not the -pooler one. Hikari applies
+      # this schema by issuing SET search_path on each connection, and Neon's pooler
+      # multiplexes connections per transaction, so the SET is silently lost on some
+      # of them. The failure is intermittent, which is worse than a clean error:
+      # /api/postings returned 200 while /api/agent/status 500'd, and the boot-time
+      # seeder died with relation "company" does not exist while the tables existed.
       schema: ${DB_SCHEMA:watchdog}
   flyway:
     enabled: true

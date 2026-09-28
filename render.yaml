@@ -13,6 +13,9 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
       # Paste the Neon connection string in the Render dashboard — never commit it.
+      # Use the DIRECT endpoint (host WITHOUT -pooler). The pooled endpoint drops the
+      # SET search_path that pins this service to its own schema, which fails
+      # intermittently at runtime. See application-prod.yml for the full note.
       - key: DB_URL
         sync: false
       - key: DB_USER
