@@ -100,8 +100,19 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * API origin. Empty in dev so Vite's proxy handles `/api/...`; in production the
+ * dashboard is on Vercel and the API on Render, so they are separate origins and
+ * VITE_API_BASE supplies the backend URL at build time.
+ */
+const API_BASE = (import.meta.env.VITE_API_BASE ?? '').replace(/\/$/, '');
+
+function url(path: string): string {
+  return `${API_BASE}${path}`;
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(path, {
+  const res = await fetch(url(path), {
     headers: { 'Content-Type': 'application/json', ...(init?.headers ?? {}) },
     ...init,
   });
@@ -156,7 +167,7 @@ export interface PollResult {
 
 /** Trigger an on-demand refresh. Resolves with 'polled' or 'cooldown' (never throws on 429). */
 export async function triggerPoll(): Promise<PollResult> {
-  const res = await fetch('/api/agent/poll', {
+  const res = await fetch(url('/api/agent/poll'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
   });
