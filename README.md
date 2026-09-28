@@ -39,7 +39,7 @@ read-heavy and shaped for the feed.
 | `GET /health` | liveness |
 
 ## Stack
-Java 21 · Spring Boot (hexagonal) · PostgreSQL + Flyway · scheduled poller
+Java 21 · Spring Boot (hexagonal) · PostgreSQL + Flyway · Redis (ShedLock) · scheduled poller
 React 19 · Vite · TypeScript · Tailwind
 
 ## Thesis

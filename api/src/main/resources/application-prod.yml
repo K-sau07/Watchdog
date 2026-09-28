@@ -1,0 +1,40 @@
+# Production profile. Everything sensitive comes from the environment — nothing
+# secret is committed. Render injects PORT; the datasource points at Neon.
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    hikari:
+      # Neon's free tier is modest and the service is single-user; a small pool
+      # avoids exhausting connection limits during a cold start.
+      maximum-pool-size: 5
+      minimum-idle: 1
+      connection-timeout: 30000
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+  data:
+    redis:
+      # Required — ShedLock uses Redis so the poll cycle runs on exactly one
+      # instance (SchedulingConfig). Upstash gives a rediss:// URL.
+      url: ${REDIS_URL}
+
+server:
+  port: ${PORT:8080}
+
+watchdog:
+  polling:
+    enabled: ${POLLING_ENABLED:true}
+    interval-ms: ${POLL_INTERVAL_MS:3600000}
+
+logging:
+  level:
+    root: INFO
+    com.watchdog: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health

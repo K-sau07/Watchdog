@@ -1,0 +1,24 @@
+# Render Blueprint — New → Blueprint → point at this repo.
+# Free tier: the service sleeps after ~15 min idle and cold-starts in ~50s.
+services:
+  - type: web
+    name: watchdog-api
+    runtime: docker
+    dockerfilePath: ./api/Dockerfile
+    dockerContext: ./api
+    plan: free
+    region: oregon
+    healthCheckPath: /api/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      # Paste the Neon connection string in the Render dashboard — never commit it.
+      - key: DB_URL
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      # Upstash rediss:// URL — ShedLock needs it, the poll won't start without it.
+      - key: REDIS_URL
+        sync: false
