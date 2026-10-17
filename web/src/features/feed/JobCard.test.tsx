@@ -15,6 +15,7 @@ const posting: PostingSummary = {
   salary: { min: 120000, max: 150000, currency: 'USD' },
   url: 'https://example.com/job',
   source: 'GREENHOUSE',
+  fundingStage: 'SERIES_A',
   postedAt: '2026-09-08T11:56:00Z',
   firstSeenAt: '2026-09-08T12:00:00Z',
   caughtMinutes: 4,
@@ -27,6 +28,18 @@ describe('JobCard', () => {
     expect(screen.getByText(/Ramp · New York, NY · onsite · full-time/)).toBeInTheDocument()
     expect(screen.getByText('$120k–150k')).toBeInTheDocument()
     expect(screen.getByText('caught 4 min')).toBeInTheDocument()
+  })
+
+  it('badges the company funding stage', () => {
+    render(<JobCard posting={posting} />)
+    expect(screen.getByText('series A')).toBeInTheDocument()
+  })
+
+  it('shows no stage badge when the stage is unknown or absent', () => {
+    const { rerender } = render(<JobCard posting={{ ...posting, fundingStage: 'UNKNOWN' }} />)
+    expect(screen.queryByText(/series|seed|late stage/i)).not.toBeInTheDocument()
+    rerender(<JobCard posting={{ ...posting, fundingStage: null }} />)
+    expect(screen.queryByText(/series|seed|late stage/i)).not.toBeInTheDocument()
   })
 
   it('links the title to the posting url', () => {

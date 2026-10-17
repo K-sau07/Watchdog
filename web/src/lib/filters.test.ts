@@ -46,6 +46,23 @@ describe('toQueryString', () => {
   })
 })
 
+describe('stage dimension', () => {
+  it('serializes stages under the backend\'s `stage` param name', () => {
+    const qs = new URLSearchParams(
+      toQueryString({ ...EMPTY_FILTER, stages: ['SEED', 'SERIES_A'] }),
+    )
+    expect(qs.get('stage')).toBe('SEED,SERIES_A')
+  })
+
+  it('omits the param entirely when no stage is selected', () => {
+    expect(new URLSearchParams(toQueryString(EMPTY_FILTER)).has('stage')).toBe(false)
+  })
+
+  it('counts as one active dimension', () => {
+    expect(activeCount({ ...EMPTY_FILTER, stages: ['SEED', 'SERIES_A'] })).toBe(1)
+  })
+})
+
 describe('activeCount', () => {
   it('is zero for the empty filter', () => {
     expect(activeCount(EMPTY_FILTER)).toBe(0)

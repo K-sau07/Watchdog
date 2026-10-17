@@ -3,6 +3,7 @@ package com.watchdog.infrastructure.web;
 import com.watchdog.domain.model.AtsSource;
 import com.watchdog.domain.model.EmploymentType;
 import com.watchdog.domain.model.FilterCriteria;
+import com.watchdog.domain.model.FundingStage;
 import com.watchdog.domain.model.JobState;
 import com.watchdog.domain.model.RemoteType;
 import com.watchdog.domain.model.Seniority;
@@ -49,6 +50,7 @@ final class PostingQueryMapper {
                 .remoteTypes(parseEnumSet(p.remote(), RemoteType.class, "remote"))
                 .employmentTypes(parseEnumSet(p.employmentType(), EmploymentType.class, "employmentType"))
                 .sources(parseEnumSet(p.source(), AtsSource.class, "source"))
+                .fundingStages(parseEnumSet(p.stage(), FundingStage.class, "stage"))
                 .statesToShow(parseEnumSet(p.state(), JobState.class, "state"));
 
         if (p.salaryMin() != null) {

@@ -7,8 +7,9 @@ package com.watchdog.infrastructure.web;
  * constraint on this dimension" (spec §5). List-style fields are comma-separated.
  *
  * <p>Field names are the query-param names: {@code ?roles=&keywords=&exclude=&location=
- * &seniority=&remote=&employmentType=&source=&state=&salaryMin=&includeUnknownSalary=
- * &sponsorship=&postedWithin=&dateFrom=&dateTo=&sort=&page=&size=} (spec §7).
+ * &seniority=&remote=&employmentType=&source=&stage=&state=&salaryMin=
+ * &includeUnknownSalary=&sponsorship=&postedWithin=&dateFrom=&dateTo=&sort=&page=&size=}
+ * (spec §7).
  */
 public record PostingQueryParams(
         String roles,
@@ -19,6 +20,7 @@ public record PostingQueryParams(
         String remote,
         String employmentType,
         String source,
+        String stage,
         String state,
         String salaryMin,
         Boolean includeUnknownSalary,

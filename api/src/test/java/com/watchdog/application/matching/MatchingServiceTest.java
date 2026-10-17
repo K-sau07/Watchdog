@@ -7,7 +7,9 @@ import com.watchdog.domain.model.AtsSource;
 import com.watchdog.domain.model.Company;
 import com.watchdog.domain.model.EmploymentType;
 import com.watchdog.domain.model.FilterCriteria;
+import com.watchdog.domain.model.FundingStage;
 import com.watchdog.domain.model.JobState;
+import com.watchdog.domain.model.StageSource;
 import com.watchdog.domain.model.JobStateRecord;
 import com.watchdog.domain.model.Posting;
 import com.watchdog.domain.model.RemoteType;
@@ -90,6 +92,13 @@ class MatchingServiceTest {
 
     private Company company(AtsSource source) {
         Company c = Company.register("Co-" + source, source, "slug-" + source);
+        companies.save(c);
+        return c;
+    }
+
+    private Company company(String name, FundingStage stage) {
+        Company c = Company.register(name, AtsSource.GREENHOUSE, name.toLowerCase(java.util.Locale.ROOT),
+                stage, StageSource.YC_DIRECTORY, java.time.LocalDate.of(2026, 10, 17));
         companies.save(c);
         return c;
     }
@@ -259,5 +268,49 @@ class MatchingServiceTest {
         assertThat(org.assertj.core.api.Assertions.catchThrowable(
                 () -> service().search(FilterCriteria.all(), 0, 0)))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void filtersByFundingStage() {
+        Company seed = company("Seedco", FundingStage.SEED);
+        Company late = company("Lateco", FundingStage.GROWTH);
+        posting(seed, "Backend Engineer", "d", NOW, Salary.empty(), SponsorshipSignal.UNKNOWN);
+        posting(late, "Backend Engineer", "d", NOW, Salary.empty(), SponsorshipSignal.UNKNOWN);
+
+        FilterCriteria earlyOnly = FilterCriteria.builder()
+                .fundingStages(Set.of(FundingStage.SEED, FundingStage.SERIES_A)).build();
+        MatchingService.Page page = service().search(earlyOnly, 0, 10);
+
+        assertThat(page.totalMatched()).isEqualTo(1);
+        assertThat(page.items().get(0).companyName()).isEqualTo("Seedco");
+    }
+
+    /**
+     * A company whose stage was never established must not slip through an early-stage
+     * filter. An unestablished stage is not evidence of an early one — the whole point of
+     * the filter is that the feed stops showing late-stage noise.
+     */
+    @Test
+    void unknownStageIsExcludedWhenStagesAreRequested() {
+        Company unknown = company("Mysteryco", FundingStage.UNKNOWN);
+        posting(unknown, "Backend Engineer", "d", NOW, Salary.empty(), SponsorshipSignal.UNKNOWN);
+
+        FilterCriteria earlyOnly = FilterCriteria.builder()
+                .fundingStages(Set.of(FundingStage.SEED, FundingStage.SERIES_A)).build();
+
+        assertThat(service().search(earlyOnly, 0, 10).totalMatched()).isZero();
+        // ...and comes back when the caller explicitly asks for it.
+        FilterCriteria withUnknown = FilterCriteria.builder()
+                .fundingStages(Set.of(FundingStage.SEED, FundingStage.UNKNOWN)).build();
+        assertThat(service().search(withUnknown, 0, 10).totalMatched()).isEqualTo(1);
+    }
+
+    @Test
+    void emptyStageSetIsNoConstraint() {
+        company("Seedco", FundingStage.SEED);
+        Company late = company("Lateco", FundingStage.GROWTH);
+        posting(late, "Backend Engineer", "d", NOW, Salary.empty(), SponsorshipSignal.UNKNOWN);
+
+        assertThat(service().search(FilterCriteria.all(), 0, 10).totalMatched()).isEqualTo(1);
     }
 }

@@ -35,23 +35,45 @@ public class DiscoveryService {
     public SeedResult seed() {
         int added = 0;
         int skipped = 0;
+        int restaged = 0;
         for (CompanySeedSource.SeedEntry entry : seedSource.load()) {
-            boolean exists = companies.findBySourceAndSlug(entry.source(), entry.slug()).isPresent();
-            if (exists) {
-                skipped++;
+            var existing = companies.findBySourceAndSlug(entry.source(), entry.slug());
+            if (existing.isPresent()) {
+                // Already registered, but the seed may now carry a stage claim the
+                // stored row predates — the curated rows were all added before stage
+                // tracking existed. withStage refuses a downgrade, so re-seeding is
+                // safe to run repeatedly and cannot clobber a better-sourced value.
+                Company current = existing.get();
+                Company updated = current.withStage(
+                        entry.stage(), entry.stageSource(), entry.stageAsOf());
+                if (updated != current) {
+                    companies.save(updated);
+                    restaged++;
+                } else {
+                    skipped++;
+                }
                 continue;
             }
-            companies.save(Company.register(entry.name(), entry.source(), entry.slug()));
+            companies.save(Company.register(
+                    entry.name(), entry.source(), entry.slug(),
+                    entry.stage(), entry.stageSource(), entry.stageAsOf()));
             added++;
         }
-        log.info("Registry seed complete: {} added, {} already present", added, skipped);
-        return new SeedResult(added, skipped);
+        log.info("Registry seed complete: {} added, {} restaged, {} unchanged",
+                added, restaged, skipped);
+        return new SeedResult(added, skipped, restaged);
     }
 
     /** Outcome of a seed run. */
-    public record SeedResult(int added, int skipped) {
+    public record SeedResult(int added, int skipped, int restaged) {
+
+        /** Back-compat for callers that predate stage tracking. */
+        public SeedResult(int added, int skipped) {
+            this(added, skipped, 0);
+        }
+
         public int total() {
-            return added + skipped;
+            return added + skipped + restaged;
         }
     }
 }

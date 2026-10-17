@@ -32,6 +32,7 @@ final class PostingDtos {
             SalaryDto salary,
             String url,
             String source,          // resolved from the company, may be null if unknown
+            String fundingStage,    // company's stage; null if the company is unknown
             Instant postedAt,
             Instant firstSeenAt,
             Long caughtMinutes      // the signature stat; null when postedAt unknown (§8.4)
@@ -77,6 +78,7 @@ final class PostingDtos {
                 SalaryDto.from(p.salary()),
                 p.url(),
                 m.source() == null ? null : m.source().name(),
+                m.fundingStage() == null ? null : m.fundingStage().name(),
                 p.postedAt(),
                 p.firstSeenAt(),
                 p.catchMinutes().orElse(null));

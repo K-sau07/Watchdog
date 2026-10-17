@@ -51,7 +51,7 @@ describe('metaLine', () => {
   const base: PostingSummary = {
     id: '1', title: 'SWE', companyName: 'Ramp', location: 'New York',
     remoteType: 'REMOTE', employmentType: 'FULL_TIME', seniority: 'NEW_GRAD',
-    sponsorshipSignal: 'OFFERED', salary: null, url: null, source: 'GREENHOUSE',
+    sponsorshipSignal: 'OFFERED', salary: null, url: null, source: 'GREENHOUSE', fundingStage: null,
     postedAt: null, firstSeenAt: '2026-09-08T12:00:00Z', caughtMinutes: 2,
   }
   it('joins company, location, remote, type', () => {

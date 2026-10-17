@@ -35,3 +35,6 @@ logs/
 # ── Docker volumes (local data) ──
 pgdata/
 redisdata/
+
+# Generator cache for scripts/generate-company-seed.py — probe results, not source.
+scripts/.seed-cache.json

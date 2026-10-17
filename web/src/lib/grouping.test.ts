@@ -6,7 +6,7 @@ function p(id: string, companyName: string | null, source = 'GREENHOUSE'): Posti
   return {
     id, title: `Role ${id}`, companyName, location: null, remoteType: 'REMOTE',
     employmentType: 'FULL_TIME', seniority: 'MID', sponsorshipSignal: 'UNKNOWN',
-    salary: null, url: null, source, postedAt: null, firstSeenAt: '2026-09-08T12:00:00Z',
+    salary: null, url: null, source, fundingStage: null, postedAt: null, firstSeenAt: '2026-09-08T12:00:00Z',
     caughtMinutes: null,
   }
 }

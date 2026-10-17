@@ -5,6 +5,7 @@ import com.watchdog.domain.id.PostingId;
 import com.watchdog.domain.model.AtsSource;
 import com.watchdog.domain.model.Company;
 import com.watchdog.domain.model.FilterCriteria;
+import com.watchdog.domain.model.FundingStage;
 import com.watchdog.domain.model.JobState;
 import com.watchdog.domain.model.Posting;
 import com.watchdog.domain.model.PostingMatcher;
@@ -35,11 +36,12 @@ import java.util.stream.Collectors;
  * or SQL here (the web slice is S6.5, the query adapter S6.6).
  *
  * <p><b>How matching is split.</b> {@link PostingMatcher} evaluates every dimension a
- * Posting can answer alone. This service adds the three it deliberately left out
+ * Posting can answer alone. This service adds the four it deliberately left out
  * (documented on PostingMatcher): <i>seniority</i> (now parseable via
- * {@link SeniorityParser}), <i>source</i> (a {@link Company} attribute, resolved by a
- * companyId→source map), and <i>job state</i> (per-user, via {@link JobStateRepository};
- * a posting with no state row is implicitly {@link JobState#NEW}).
+ * {@link SeniorityParser}), <i>source</i> and <i>funding stage</i> (both {@link Company}
+ * attributes, resolved through the companyId→Company map), and <i>job state</i>
+ * (per-user, via {@link JobStateRepository}; a posting with no state row is implicitly
+ * {@link JobState#NEW}).
  *
  * <p><b>Enrichment (D-WD10, read-time, not persisted).</b> When the ATS gave no
  * sponsorship or salary signal, the heuristic parsers fill them in before matching, so a
@@ -168,7 +170,7 @@ public class MatchingService {
         return new MatchedPosting(enriched, seniority);
     }
 
-    // --- matching: PostingMatcher + the three dimensions it leaves to the query layer ---
+    // --- matching: PostingMatcher + the four dimensions it leaves to the query layer ---
 
     private boolean matchesAll(MatchedPosting m, FilterCriteria criteria, Instant now,
                                Map<CompanyId, Company> companyById) {
@@ -176,6 +178,7 @@ public class MatchingService {
         return PostingMatcher.matches(p, criteria, now)
                 && matchesSeniority(m.seniority(), criteria)
                 && matchesSource(p.companyId(), criteria, companyById)
+                && matchesFundingStage(p.companyId(), criteria, companyById)
                 && matchesState(p, criteria);
     }
 
@@ -189,6 +192,23 @@ public class MatchingService {
         if (criteria.sources().isEmpty()) return true;
         Company company = companyById.get(companyId);
         return company != null && criteria.sources().contains(company.atsSource());
+    }
+
+    /**
+     * Funding-stage filter — a {@link Company} attribute, so it resolves here rather than
+     * in {@link PostingMatcher}, exactly as {@code source} does.
+     *
+     * <p>A company whose stage was never established carries
+     * {@link com.watchdog.domain.model.FundingStage#UNKNOWN}, so asking for
+     * {@code SEED,SERIES_A} genuinely excludes it. That is the honest reading: an
+     * unestablished stage is not evidence of an early one. Callers who want those rows
+     * back include UNKNOWN in the set.
+     */
+    private static boolean matchesFundingStage(CompanyId companyId, FilterCriteria criteria,
+                                               Map<CompanyId, Company> companyById) {
+        if (criteria.fundingStages().isEmpty()) return true;
+        Company company = companyById.get(companyId);
+        return company != null && criteria.fundingStages().contains(company.fundingStage());
     }
 
     /**
@@ -208,19 +228,24 @@ public class MatchingService {
 
     /**
      * A posting that passed the filter, plus values derived at read time: the parsed
-     * {@link Seniority}, the resolved ATS {@code source}, and the owning {@code companyName}
-     * (both null only if the posting's company is no longer active/known). Company details
-     * are attached after matching in {@link #search} / {@link #findEnriched}.
+     * {@link Seniority}, the resolved ATS {@code source}, the owning {@code companyName},
+     * and the company's {@code fundingStage} (all null only if the posting's company is no
+     * longer active/known). Company details are attached after matching in
+     * {@link #search} / {@link #findEnriched}.
+     *
+     * <p>The stage travels with the card because it is the dimension the feed is sorted
+     * around — a reader needs to see why a posting qualified, not just that it did.
      */
     public record MatchedPosting(Posting posting, Seniority seniority, AtsSource source,
-                                 String companyName) {
+                                 String companyName, FundingStage fundingStage) {
         MatchedPosting(Posting posting, Seniority seniority) {
-            this(posting, seniority, null, null);
+            this(posting, seniority, null, null, null);
         }
         MatchedPosting withCompany(Company company) {
             return company == null
                     ? this
-                    : new MatchedPosting(posting, seniority, company.atsSource(), company.name());
+                    : new MatchedPosting(posting, seniority, company.atsSource(), company.name(),
+                            company.fundingStage());
         }
     }
 

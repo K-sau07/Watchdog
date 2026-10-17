@@ -2,6 +2,8 @@ package com.watchdog.infrastructure.registry;
 
 import com.watchdog.application.registry.CompanySeedSource;
 import com.watchdog.domain.model.AtsSource;
+import com.watchdog.domain.model.FundingStage;
+import com.watchdog.domain.model.StageSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -10,6 +12,8 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,7 +67,28 @@ public class JsonCompanySeedSource implements CompanySeedSource {
         } catch (IllegalArgumentException e) {
             return null; // skip unknown source values
         }
-        return new SeedEntry(name, source, slug);
+        // Stage fields are optional: the generator emits them, the older curated
+        // rows do not, and both must keep loading. Unparseable values degrade to
+        // UNKNOWN rather than dropping an otherwise-good board.
+        return new SeedEntry(
+                name,
+                source,
+                slug,
+                FundingStage.parseOrUnknown(text(node, "stage")),
+                StageSource.parseOrUnknown(text(node, "stageSource")),
+                parseDate(text(node, "stageAsOf")),
+                text(node, "matchConfidence"));
+    }
+
+    private static LocalDate parseDate(String raw) {
+        if (raw == null) {
+            return null;
+        }
+        try {
+            return LocalDate.parse(raw);
+        } catch (DateTimeParseException e) {
+            return null; // a malformed date is no date, not a reason to drop the row
+        }
     }
 
     private static String text(JsonNode node, String field) {

@@ -14,6 +14,7 @@ export interface FilterState {
   remote: string[];
   employmentType: string[];
   source: string[];
+  stages: string[];
   state: string[];
   salaryMin: number | null;
   includeUnknownSalary: boolean | null;
@@ -36,6 +37,7 @@ export const EMPTY_FILTER: FilterState = {
   remote: [],
   employmentType: [],
   source: [],
+  stages: [],
   state: [],
   salaryMin: null,
   includeUnknownSalary: null,
@@ -66,6 +68,7 @@ export function toQueryString(f: FilterState): string {
   list('remote', f.remote);
   list('employmentType', f.employmentType);
   list('source', f.source);
+  list('stage', f.stages);
   list('state', f.state);
   if (f.salaryMin !== null) p.set('salaryMin', String(f.salaryMin));
   if (f.includeUnknownSalary !== null) p.set('includeUnknownSalary', String(f.includeUnknownSalary));
@@ -90,6 +93,7 @@ export function activeCount(f: FilterState): number {
   n += f.remote.length ? 1 : 0;
   n += f.employmentType.length ? 1 : 0;
   n += f.source.length ? 1 : 0;
+  n += f.stages.length ? 1 : 0;
   n += f.state.length ? 1 : 0;
   n += f.salaryMin !== null ? 1 : 0;
   n += f.sponsorship ? 1 : 0;

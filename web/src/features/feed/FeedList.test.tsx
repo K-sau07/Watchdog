@@ -7,7 +7,7 @@ const posting: PostingSummary = {
   id: 'p1', title: 'Software Engineer, New Grad', companyName: 'Ramp',
   location: 'NYC', remoteType: 'REMOTE', employmentType: 'FULL_TIME',
   seniority: 'NEW_GRAD', sponsorshipSignal: 'OFFERED', salary: null, url: null,
-  source: 'GREENHOUSE', postedAt: null, firstSeenAt: '2026-09-08T12:00:00Z', caughtMinutes: 2,
+  source: 'GREENHOUSE', fundingStage: null, postedAt: null, firstSeenAt: '2026-09-08T12:00:00Z', caughtMinutes: 2,
 }
 
 const noop = () => {}

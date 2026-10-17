@@ -10,6 +10,12 @@ import java.util.Set;
  * with a builder for ergonomics. Empty/absent fields mean "no constraint on this
  * dimension" — so {@link #all()} matches everything.
  *
+ * <p>{@code fundingStages} constrains the company a posting came from, not the
+ * posting itself — the same class of dimension as {@code sources}. Like
+ * {@code sources} it is therefore NOT evaluated by {@link PostingMatcher}, which
+ * only sees one Posting; it is applied at the query layer where the company join
+ * exists. Putting it in the predicate would mean silently ignoring it.
+ *
  * <p>The actual matching lives in {@link PostingMatcher} (a pure predicate). Heuristic
  * parsers that populate a Posting's seniority/sponsorship/etc. are out of scope here —
  * they arrive in S6. This type only constrains fields already present on a Posting.
@@ -30,6 +36,7 @@ public record FilterCriteria(
         boolean includeUnknownSalary,     // when salaryMin set: keep postings w/o salary?
         SponsorshipPref sponsorshipPref,  // ANY = no constraint
         Set<AtsSource> sources,           // empty = any
+        Set<FundingStage> fundingStages,  // empty = any; a Company attribute (see note)
         Set<JobState> statesToShow,       // empty = any (feed usually hides HIDDEN)
         java.time.Duration postedWithin,  // null = no relative window
         Instant seenFrom,                 // null = no lower bound
@@ -66,12 +73,14 @@ public record FilterCriteria(
         private boolean includeUnknownSalary = true;
         private SponsorshipPref sponsorshipPref = SponsorshipPref.ANY;
         private Set<AtsSource> sources = Set.of();
+        private Set<FundingStage> fundingStages = Set.of();
         private Set<JobState> statesToShow = Set.of();
         private java.time.Duration postedWithin = null;
         private Instant seenFrom = null;
         private Instant seenTo = null;
         private boolean usOnly = false;
 
+        public Builder fundingStages(Set<FundingStage> v) { this.fundingStages = safeSet(v); return this; }
         public Builder roleKeywords(List<String> v) { this.roleKeywords = safe(v); return this; }
         public Builder includeKeywords(List<String> v) { this.includeKeywords = safe(v); return this; }
         public Builder excludeKeywords(List<String> v) { this.excludeKeywords = safe(v); return this; }
@@ -93,7 +102,7 @@ public record FilterCriteria(
             return new FilterCriteria(
                     roleKeywords, includeKeywords, excludeKeywords, seniorities, remoteTypes,
                     locations, employmentTypes, salaryMin, includeUnknownSalary, sponsorshipPref,
-                    sources, statesToShow, postedWithin, seenFrom, seenTo, usOnly);
+                    sources, fundingStages, statesToShow, postedWithin, seenFrom, seenTo, usOnly);
         }
 
         private static List<String> safe(List<String> v) { return v == null ? List.of() : List.copyOf(v); }

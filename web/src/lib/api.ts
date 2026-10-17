@@ -25,6 +25,7 @@ export interface PostingSummary {
   salary: SalaryDto | null;
   url: string | null;
   source: string | null;
+  fundingStage: string | null; // company's funding stage; null if the company is unknown
   postedAt: string | null; // ISO instant
   firstSeenAt: string; // ISO instant
   caughtMinutes: number | null; // the signature stat; null when postedAt unknown

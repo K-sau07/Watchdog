@@ -1,675 +1,3153 @@
 {
-  "_comment": "Watchdog company seed registry (D-WD1). Each entry is a VERIFIED ATS board \u2014 name, source (GREENHOUSE|LEVER|ASHBY), and slug (the {company} in the ATS API URL). Every slug here has been probed against the live ATS API and returns a real board. Target is ~500 early-career-SWE companies; grow by APPENDING verified rows only \u2014 never add a slug that hasn't been confirmed to resolve, or the poll cycle 404s on it. Loaded idempotently at startup by DiscoveryService (upsert by source+slug).",
   "companies": [
     {
-      "name": "Stripe",
-      "source": "GREENHOUSE",
-      "slug": "stripe"
-    },
-    {
-      "name": "Airbnb",
-      "source": "GREENHOUSE",
-      "slug": "airbnb"
-    },
-    {
-      "name": "Dropbox",
-      "source": "GREENHOUSE",
-      "slug": "dropbox"
-    },
-    {
-      "name": "Coinbase",
-      "source": "GREENHOUSE",
-      "slug": "coinbase"
-    },
-    {
-      "name": "Robinhood",
-      "source": "GREENHOUSE",
-      "slug": "robinhood"
-    },
-    {
-      "name": "Databricks",
-      "source": "GREENHOUSE",
-      "slug": "databricks"
-    },
-    {
-      "name": "Brex",
-      "source": "GREENHOUSE",
-      "slug": "brex"
-    },
-    {
-      "name": "GitLab",
-      "source": "GREENHOUSE",
-      "slug": "gitlab"
-    },
-    {
-      "name": "Discord",
-      "source": "GREENHOUSE",
-      "slug": "discord"
-    },
-    {
-      "name": "Reddit",
-      "source": "GREENHOUSE",
-      "slug": "reddit"
-    },
-    {
-      "name": "Instacart",
-      "source": "GREENHOUSE",
-      "slug": "instacart"
-    },
-    {
-      "name": "Figma",
-      "source": "GREENHOUSE",
-      "slug": "figma"
-    },
-    {
-      "name": "Asana",
-      "source": "GREENHOUSE",
-      "slug": "asana"
-    },
-    {
-      "name": "Cloudflare",
-      "source": "GREENHOUSE",
-      "slug": "cloudflare"
-    },
-    {
-      "name": "Affirm",
-      "source": "GREENHOUSE",
-      "slug": "affirm"
-    },
-    {
-      "name": "Gusto",
-      "source": "GREENHOUSE",
-      "slug": "gusto"
-    },
-    {
-      "name": "Spotify",
-      "source": "LEVER",
-      "slug": "spotify"
-    },
-    {
-      "name": "Lever Demo",
-      "source": "LEVER",
-      "slug": "leverdemo"
-    },
-    {
-      "name": "Linear",
+      "name": "Abacum",
       "source": "ASHBY",
-      "slug": "linear"
-    },
-    {
-      "name": "Ramp",
-      "source": "ASHBY",
-      "slug": "ramp"
-    },
-    {
-      "name": "OpenAI",
-      "source": "ASHBY",
-      "slug": "openai"
-    },
-    {
-      "name": "Notion",
-      "source": "ASHBY",
-      "slug": "notion"
-    },
-    {
-      "name": "Replit",
-      "source": "ASHBY",
-      "slug": "replit"
-    },
-    {
-      "name": "PostHog",
-      "source": "ASHBY",
-      "slug": "posthog"
-    },
-    {
-      "name": "ClickUp",
-      "source": "ASHBY",
-      "slug": "clickup"
-    },
-    {
-      "name": "Lyft",
-      "source": "GREENHOUSE",
-      "slug": "lyft"
-    },
-    {
-      "name": "Twitch",
-      "source": "GREENHOUSE",
-      "slug": "twitch"
-    },
-    {
-      "name": "Roblox",
-      "source": "GREENHOUSE",
-      "slug": "roblox"
-    },
-    {
-      "name": "Pinterest",
-      "source": "GREENHOUSE",
-      "slug": "pinterest"
-    },
-    {
-      "name": "Nuro",
-      "source": "GREENHOUSE",
-      "slug": "nuro"
-    },
-    {
-      "name": "Flexport",
-      "source": "GREENHOUSE",
-      "slug": "flexport"
-    },
-    {
-      "name": "Samsara",
-      "source": "GREENHOUSE",
-      "slug": "samsara"
-    },
-    {
-      "name": "Waymo",
-      "source": "GREENHOUSE",
-      "slug": "waymo"
-    },
-    {
-      "name": "Mixpanel",
-      "source": "GREENHOUSE",
-      "slug": "mixpanel"
-    },
-    {
-      "name": "Amplitude",
-      "source": "GREENHOUSE",
-      "slug": "amplitude"
-    },
-    {
-      "name": "Calendly",
-      "source": "GREENHOUSE",
-      "slug": "calendly"
-    },
-    {
-      "name": "Scale AI",
-      "source": "GREENHOUSE",
-      "slug": "scaleai"
-    },
-    {
-      "name": "Airtable",
-      "source": "GREENHOUSE",
-      "slug": "airtable"
-    },
-    {
-      "name": "SoFi",
-      "source": "GREENHOUSE",
-      "slug": "sofi"
-    },
-    {
-      "name": "Chime",
-      "source": "GREENHOUSE",
-      "slug": "chime"
-    },
-    {
-      "name": "Squarespace",
-      "source": "GREENHOUSE",
-      "slug": "squarespace"
-    },
-    {
-      "name": "Toast",
-      "source": "GREENHOUSE",
-      "slug": "toast"
-    },
-    {
-      "name": "Cockroachlabs",
-      "source": "GREENHOUSE",
-      "slug": "cockroachlabs"
-    },
-    {
-      "name": "Starburst",
-      "source": "GREENHOUSE",
-      "slug": "starburst"
-    },
-    {
-      "name": "Netlify",
-      "source": "GREENHOUSE",
-      "slug": "netlify"
-    },
-    {
-      "name": "Fivetran",
-      "source": "GREENHOUSE",
-      "slug": "fivetran"
-    },
-    {
-      "name": "Planetscale",
-      "source": "GREENHOUSE",
-      "slug": "planetscale"
-    },
-    {
-      "name": "Vercel",
-      "source": "GREENHOUSE",
-      "slug": "vercel"
-    },
-    {
-      "name": "MongoDB",
-      "source": "GREENHOUSE",
-      "slug": "mongodb"
-    },
-    {
-      "name": "Tailscale",
-      "source": "GREENHOUSE",
-      "slug": "tailscale"
-    },
-    {
-      "name": "Twilio",
-      "source": "GREENHOUSE",
-      "slug": "twilio"
-    },
-    {
-      "name": "Huntress",
-      "source": "GREENHOUSE",
-      "slug": "huntress"
-    },
-    {
-      "name": "Okta",
-      "source": "GREENHOUSE",
-      "slug": "okta"
+      "slug": "abacum",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
     },
     {
       "name": "Abnormal Security",
       "source": "GREENHOUSE",
-      "slug": "abnormalsecurity"
+      "slug": "abnormalsecurity",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
     },
     {
-      "name": "Elastic",
+      "name": "Accord",
+      "source": "ASHBY",
+      "slug": "accord",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Affirm",
       "source": "GREENHOUSE",
-      "slug": "elastic"
+      "slug": "affirm",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
     },
     {
-      "name": "Cribl",
+      "name": "AfterQuery",
+      "source": "ASHBY",
+      "slug": "afterquery",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "AIOS",
+      "source": "ASHBY",
+      "slug": "aios",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "AiPrise",
+      "source": "ASHBY",
+      "slug": "aiprise",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Airbnb",
       "source": "GREENHOUSE",
-      "slug": "cribl"
+      "slug": "airbnb",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
     },
     {
-      "name": "Remote",
+      "name": "Airtable",
       "source": "GREENHOUSE",
-      "slug": "remote"
+      "slug": "airtable",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
     },
     {
-      "name": "Netskope",
+      "name": "Albedo",
       "source": "GREENHOUSE",
-      "slug": "netskope"
-    },
-    {
-      "name": "Lattice",
-      "source": "GREENHOUSE",
-      "slug": "lattice"
-    },
-    {
-      "name": "Datadog",
-      "source": "GREENHOUSE",
-      "slug": "datadog"
-    },
-    {
-      "name": "Greenhouse",
-      "source": "GREENHOUSE",
-      "slug": "greenhouse"
-    },
-    {
-      "name": "Zscaler",
-      "source": "GREENHOUSE",
-      "slug": "zscaler"
-    },
-    {
-      "name": "Justworks",
-      "source": "GREENHOUSE",
-      "slug": "justworks"
-    },
-    {
-      "name": "Labelbox",
-      "source": "GREENHOUSE",
-      "slug": "labelbox"
-    },
-    {
-      "name": "Assemblyai",
-      "source": "GREENHOUSE",
-      "slug": "assemblyai"
-    },
-    {
-      "name": "Anthropic",
-      "source": "GREENHOUSE",
-      "slug": "anthropic"
-    },
-    {
-      "name": "Ro",
-      "source": "LEVER",
-      "slug": "ro"
-    },
-    {
-      "name": "Swordhealth",
-      "source": "LEVER",
-      "slug": "swordhealth"
-    },
-    {
-      "name": "Match Group",
-      "source": "LEVER",
-      "slug": "matchgroup"
-    },
-    {
-      "name": "Gopuff",
-      "source": "LEVER",
-      "slug": "gopuff"
-    },
-    {
-      "name": "Runway",
-      "source": "ASHBY",
-      "slug": "runway"
-    },
-    {
-      "name": "Hex",
-      "source": "ASHBY",
-      "slug": "hex"
-    },
-    {
-      "name": "Vanta",
-      "source": "ASHBY",
-      "slug": "vanta"
-    },
-    {
-      "name": "Zed",
-      "source": "ASHBY",
-      "slug": "zed"
-    },
-    {
-      "name": "Warp",
-      "source": "ASHBY",
-      "slug": "warp"
-    },
-    {
-      "name": "Cursor",
-      "source": "ASHBY",
-      "slug": "cursor"
-    },
-    {
-      "name": "Perplexity",
-      "source": "ASHBY",
-      "slug": "perplexity"
-    },
-    {
-      "name": "Modal",
-      "source": "ASHBY",
-      "slug": "modal"
-    },
-    {
-      "name": "Braintrust",
-      "source": "ASHBY",
-      "slug": "braintrust"
-    },
-    {
-      "name": "Cohere",
-      "source": "ASHBY",
-      "slug": "cohere"
-    },
-    {
-      "name": "Baseten",
-      "source": "ASHBY",
-      "slug": "baseten"
-    },
-    {
-      "name": "Granola",
-      "source": "ASHBY",
-      "slug": "granola"
-    },
-    {
-      "name": "Neon",
-      "source": "ASHBY",
-      "slug": "neon"
-    },
-    {
-      "name": "Prefect",
-      "source": "ASHBY",
-      "slug": "prefect"
-    },
-    {
-      "name": "Astronomer",
-      "source": "ASHBY",
-      "slug": "astronomer"
-    },
-    {
-      "name": "Inngest",
-      "source": "ASHBY",
-      "slug": "inngest"
-    },
-    {
-      "name": "Knock",
-      "source": "ASHBY",
-      "slug": "knock"
-    },
-    {
-      "name": "Clerk",
-      "source": "ASHBY",
-      "slug": "clerk"
-    },
-    {
-      "name": "Stytch",
-      "source": "ASHBY",
-      "slug": "stytch"
-    },
-    {
-      "name": "Resend",
-      "source": "ASHBY",
-      "slug": "resend"
-    },
-    {
-      "name": "Doppler",
-      "source": "ASHBY",
-      "slug": "doppler"
-    },
-    {
-      "name": "Workos",
-      "source": "ASHBY",
-      "slug": "workos"
-    },
-    {
-      "name": "Infisical",
-      "source": "ASHBY",
-      "slug": "infisical"
-    },
-    {
-      "name": "Weaviate",
-      "source": "ASHBY",
-      "slug": "weaviate"
-    },
-    {
-      "name": "Pinecone",
-      "source": "ASHBY",
-      "slug": "pinecone"
-    },
-    {
-      "name": "Llamaindex",
-      "source": "ASHBY",
-      "slug": "llamaindex"
-    },
-    {
-      "name": "LangChain",
-      "source": "ASHBY",
-      "slug": "langchain"
-    },
-    {
-      "name": "Lightning",
-      "source": "ASHBY",
-      "slug": "lightning"
-    },
-    {
-      "name": "Anyscale",
-      "source": "ASHBY",
-      "slug": "anyscale"
-    },
-    {
-      "name": "Fireworks AI",
-      "source": "ASHBY",
-      "slug": "fireworks"
-    },
-    {
-      "name": "Greptile",
-      "source": "ASHBY",
-      "slug": "greptile"
-    },
-    {
-      "name": "Poolside",
-      "source": "ASHBY",
-      "slug": "poolside"
-    },
-    {
-      "name": "Decagon",
-      "source": "ASHBY",
-      "slug": "decagon"
-    },
-    {
-      "name": "Sierra",
-      "source": "ASHBY",
-      "slug": "sierra"
-    },
-    {
-      "name": "Attentive",
-      "source": "GREENHOUSE",
-      "slug": "attentive"
-    },
-    {
-      "name": "Faire",
-      "source": "GREENHOUSE",
-      "slug": "faire"
-    },
-    {
-      "name": "ZoomInfo",
-      "source": "GREENHOUSE",
-      "slug": "zoominfo"
-    },
-    {
-      "name": "Hightouch",
-      "source": "GREENHOUSE",
-      "slug": "hightouch"
-    },
-    {
-      "name": "Observeai",
-      "source": "GREENHOUSE",
-      "slug": "observeai"
-    },
-    {
-      "name": "Cresta",
-      "source": "GREENHOUSE",
-      "slug": "cresta"
-    },
-    {
-      "name": "CircleCI",
-      "source": "GREENHOUSE",
-      "slug": "circleci"
-    },
-    {
-      "name": "Verkada",
-      "source": "GREENHOUSE",
-      "slug": "verkada"
-    },
-    {
-      "name": "Dialpad",
-      "source": "GREENHOUSE",
-      "slug": "dialpad"
-    },
-    {
-      "name": "LaunchDarkly",
-      "source": "GREENHOUSE",
-      "slug": "launchdarkly"
-    },
-    {
-      "name": "Intercom",
-      "source": "GREENHOUSE",
-      "slug": "intercom"
-    },
-    {
-      "name": "PagerDuty",
-      "source": "GREENHOUSE",
-      "slug": "pagerduty"
-    },
-    {
-      "name": "Honeycomb",
-      "source": "GREENHOUSE",
-      "slug": "honeycomb"
-    },
-    {
-      "name": "Imply",
-      "source": "GREENHOUSE",
-      "slug": "imply"
+      "slug": "albedo",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
     },
     {
       "name": "Algolia",
       "source": "GREENHOUSE",
-      "slug": "algolia"
+      "slug": "algolia",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
     },
     {
-      "name": "Yugabyte",
+      "name": "Alpaca",
       "source": "GREENHOUSE",
-      "slug": "yugabyte"
+      "slug": "alpaca",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
     },
     {
-      "name": "SingleStore",
+      "name": "Amplitude",
       "source": "GREENHOUSE",
-      "slug": "singlestore"
-    },
-    {
-      "name": "Orca",
-      "source": "GREENHOUSE",
-      "slug": "orca"
-    },
-    {
-      "name": "Chainguard",
-      "source": "GREENHOUSE",
-      "slug": "chainguard"
-    },
-    {
-      "name": "Postman",
-      "source": "GREENHOUSE",
-      "slug": "postman"
-    },
-    {
-      "name": "Grafanalabs",
-      "source": "GREENHOUSE",
-      "slug": "grafanalabs"
-    },
-    {
-      "name": "Montecarlodata",
-      "source": "ASHBY",
-      "slug": "montecarlodata"
+      "slug": "amplitude",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
     },
     {
       "name": "Anchorage",
       "source": "LEVER",
-      "slug": "anchorage"
+      "slug": "anchorage",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
     },
     {
-      "name": "Mintlify",
+      "name": "Andromeda Surgical",
       "source": "ASHBY",
-      "slug": "mintlify"
+      "slug": "andromedasurgical",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
     },
     {
-      "name": "Suno",
+      "name": "Anthrogen",
       "source": "ASHBY",
-      "slug": "suno"
+      "slug": "anthrogen",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
     },
     {
-      "name": "Watershed",
-      "source": "ASHBY",
-      "slug": "watershed"
+      "name": "Anthropic",
+      "source": "GREENHOUSE",
+      "slug": "anthropic",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
     },
     {
-      "name": "World Labs",
+      "name": "Anyscale",
       "source": "ASHBY",
-      "slug": "worldlabs"
+      "slug": "anyscale",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
     },
     {
-      "name": "Physicalintelligence",
+      "name": "Arini",
       "source": "ASHBY",
-      "slug": "physicalintelligence"
+      "slug": "arini",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
     },
     {
-      "name": "Thinking Machines",
+      "name": "Arketa",
       "source": "ASHBY",
-      "slug": "thinkingmachines"
+      "slug": "arketa",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Artie",
+      "source": "ASHBY",
+      "slug": "artie",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Artisan",
+      "source": "ASHBY",
+      "slug": "artisan",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Asana",
+      "source": "GREENHOUSE",
+      "slug": "asana",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Ashby",
+      "source": "ASHBY",
+      "slug": "ashby",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Assembly",
+      "source": "ASHBY",
+      "slug": "assembly",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "AssemblyAI",
+      "source": "GREENHOUSE",
+      "slug": "assemblyai",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Astranis",
+      "source": "GREENHOUSE",
+      "slug": "astranis",
+      "stage": "GROWTH",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Astronomer",
+      "source": "ASHBY",
+      "slug": "astronomer",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Atlas",
+      "source": "ASHBY",
+      "slug": "atlas",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "AtoB",
+      "source": "ASHBY",
+      "slug": "atob",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Attentive",
+      "source": "GREENHOUSE",
+      "slug": "attentive",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Aurelian",
+      "source": "ASHBY",
+      "slug": "aurelian",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "authzed",
+      "source": "ASHBY",
+      "slug": "authzed",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Avoca",
+      "source": "ASHBY",
+      "slug": "avoca",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Baseten",
+      "source": "ASHBY",
+      "slug": "baseten",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Belvo",
+      "source": "ASHBY",
+      "slug": "belvo",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Benepass",
+      "source": "ASHBY",
+      "slug": "benepass",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Beyond Reach Labs",
+      "source": "ASHBY",
+      "slug": "beyondreachlabs",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "BioRender",
+      "source": "LEVER",
+      "slug": "biorender",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Bitmovin",
+      "source": "GREENHOUSE",
+      "slug": "bitmovin",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Bland AI",
+      "source": "ASHBY",
+      "slug": "bland",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Blee",
+      "source": "ASHBY",
+      "slug": "blee",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Blissway",
+      "source": "ASHBY",
+      "slug": "blissway",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Braintrust",
+      "source": "ASHBY",
+      "slug": "braintrust",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Brex",
+      "source": "GREENHOUSE",
+      "slug": "brex",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Bunkerhill Health",
+      "source": "ASHBY",
+      "slug": "bunkerhillhealth",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Calendly",
+      "source": "GREENHOUSE",
+      "slug": "calendly",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Camber",
+      "source": "ASHBY",
+      "slug": "camber",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Cambio",
+      "source": "ASHBY",
+      "slug": "cambio",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Cambly",
+      "source": "ASHBY",
+      "slug": "cambly",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Campfire",
+      "source": "ASHBY",
+      "slug": "campfire",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Canary Technologies",
+      "source": "LEVER",
+      "slug": "canarytechnologies",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "CaptivateIQ",
+      "source": "LEVER",
+      "slug": "captivateiq",
+      "stage": "GROWTH",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "CarbonChain",
+      "source": "GREENHOUSE",
+      "slug": "carbonchain",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Castle",
+      "source": "ASHBY",
+      "slug": "castle",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Chainguard",
+      "source": "GREENHOUSE",
+      "slug": "chainguard",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Chime",
+      "source": "GREENHOUSE",
+      "slug": "chime",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Cinder",
+      "source": "ASHBY",
+      "slug": "cinder",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "CircleCI",
+      "source": "GREENHOUSE",
+      "slug": "circleci",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "CircuitHub",
+      "source": "ASHBY",
+      "slug": "circuithub",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "ClaimSorted",
+      "source": "ASHBY",
+      "slug": "claimsorted",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "ClassDojo",
+      "source": "ASHBY",
+      "slug": "classdojo",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Clerk",
+      "source": "ASHBY",
+      "slug": "clerk",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "ClickUp",
+      "source": "ASHBY",
+      "slug": "clickup",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Cloudflare",
+      "source": "GREENHOUSE",
+      "slug": "cloudflare",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Cockroachlabs",
+      "source": "GREENHOUSE",
+      "slug": "cockroachlabs",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Cohere",
+      "source": "ASHBY",
+      "slug": "cohere",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Coinbase",
+      "source": "GREENHOUSE",
+      "slug": "coinbase",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Complir",
+      "source": "ASHBY",
+      "slug": "complir",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Concourse",
+      "source": "ASHBY",
+      "slug": "concourse",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Conduit",
+      "source": "ASHBY",
+      "slug": "conduit",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Conveo",
+      "source": "ASHBY",
+      "slug": "conveo",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Cosine",
+      "source": "ASHBY",
+      "slug": "cosine",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Credal.ai",
+      "source": "ASHBY",
+      "slug": "credal",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Cresta",
+      "source": "GREENHOUSE",
+      "slug": "cresta",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Cribl",
+      "source": "GREENHOUSE",
+      "slug": "cribl",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Curri",
+      "source": "ASHBY",
+      "slug": "curri",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Cursor",
+      "source": "ASHBY",
+      "slug": "cursor",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Databricks",
+      "source": "GREENHOUSE",
+      "slug": "databricks",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Datadog",
+      "source": "GREENHOUSE",
+      "slug": "datadog",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Datafold",
+      "source": "ASHBY",
+      "slug": "datafold",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Decagon",
+      "source": "ASHBY",
+      "slug": "decagon",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Decoda Health",
+      "source": "ASHBY",
+      "slug": "decodahealth",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Deepgram",
+      "source": "ASHBY",
+      "slug": "deepgram",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Dialpad",
+      "source": "GREENHOUSE",
+      "slug": "dialpad",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Discord",
+      "source": "GREENHOUSE",
+      "slug": "discord",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Domu Technology Inc.",
+      "source": "ASHBY",
+      "slug": "domu",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "doola",
+      "source": "LEVER",
+      "slug": "doola",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Doppler",
+      "source": "ASHBY",
+      "slug": "doppler",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Dropbox",
+      "source": "GREENHOUSE",
+      "slug": "dropbox",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Duffel",
+      "source": "ASHBY",
+      "slug": "duffel",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Eight Sleep",
+      "source": "ASHBY",
+      "slug": "eightsleep",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Ekho",
+      "source": "ASHBY",
+      "slug": "ekho",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Elastic",
+      "source": "GREENHOUSE",
+      "slug": "elastic",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Electric Air",
+      "source": "ASHBY",
+      "slug": "electricair",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Ello",
+      "source": "ASHBY",
+      "slug": "ello",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Elyos AI",
+      "source": "ASHBY",
+      "slug": "elyos",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Encord",
+      "source": "ASHBY",
+      "slug": "encord",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Enode",
+      "source": "ASHBY",
+      "slug": "enode",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Epsilon3",
+      "source": "LEVER",
+      "slug": "epsilon3",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Escape",
+      "source": "ASHBY",
+      "slug": "escape",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Faire",
+      "source": "GREENHOUSE",
+      "slug": "faire",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "FamPay",
+      "source": "LEVER",
+      "slug": "fampay",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Fieldguide",
+      "source": "ASHBY",
+      "slug": "fieldguide",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Figma",
+      "source": "GREENHOUSE",
+      "slug": "figma",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Finni Health",
+      "source": "ASHBY",
+      "slug": "finni-health",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "FINNY AI",
+      "source": "ASHBY",
+      "slug": "finny",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Fireworks AI",
+      "source": "ASHBY",
+      "slug": "fireworks",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Fivetran",
+      "source": "GREENHOUSE",
+      "slug": "fivetran",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Fleetline",
+      "source": "ASHBY",
+      "slug": "fleetline",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "FleetWorks",
+      "source": "ASHBY",
+      "slug": "fleetworks",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Flexport",
+      "source": "GREENHOUSE",
+      "slug": "flexport",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "FlutterFlow",
+      "source": "ASHBY",
+      "slug": "flutterflow",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Formance",
+      "source": "ASHBY",
+      "slug": "formance",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Freshpaint",
+      "source": "ASHBY",
+      "slug": "freshpaint",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "FurtherAI",
+      "source": "ASHBY",
+      "slug": "furtherai",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "General Proximity",
+      "source": "GREENHOUSE",
+      "slug": "generalproximity",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Gigs",
+      "source": "GREENHOUSE",
+      "slug": "gigs",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "GitLab",
+      "source": "GREENHOUSE",
+      "slug": "gitlab",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "GiveCampus",
+      "source": "GREENHOUSE",
+      "slug": "givecampus",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "GoLinks",
+      "source": "ASHBY",
+      "slug": "golinks",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Gopuff",
+      "source": "LEVER",
+      "slug": "gopuff",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "GovDash",
+      "source": "ASHBY",
+      "slug": "govdash",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "GovEagle",
+      "source": "ASHBY",
+      "slug": "goveagle",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Grafanalabs",
+      "source": "GREENHOUSE",
+      "slug": "grafanalabs",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Granola",
+      "source": "ASHBY",
+      "slug": "granola",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Great Question",
+      "source": "ASHBY",
+      "slug": "greatquestion",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Greenboard",
+      "source": "ASHBY",
+      "slug": "greenboard",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Greenhouse",
+      "source": "GREENHOUSE",
+      "slug": "greenhouse",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Greptile",
+      "source": "ASHBY",
+      "slug": "greptile",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Gridware",
+      "source": "LEVER",
+      "slug": "gridware",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Gusto",
+      "source": "GREENHOUSE",
+      "slug": "gusto",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "HackerRank",
+      "source": "GREENHOUSE",
+      "slug": "hackerrank",
+      "stage": "GROWTH",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Handoff",
+      "source": "LEVER",
+      "slug": "handoff",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Happl",
+      "source": "ASHBY",
+      "slug": "happl",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Harper",
+      "source": "ASHBY",
+      "slug": "harperinsure",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Heron",
+      "source": "ASHBY",
+      "slug": "herondata",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Hex",
+      "source": "ASHBY",
+      "slug": "hex",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Hightouch",
+      "source": "GREENHOUSE",
+      "slug": "hightouch",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Hive",
+      "source": "LEVER",
+      "slug": "hive",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "HockeyStack",
+      "source": "ASHBY",
+      "slug": "hockeystack",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Honeycomb",
+      "source": "GREENHOUSE",
+      "slug": "honeycomb",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "HUD",
+      "source": "ASHBY",
+      "slug": "hud",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Humaans",
+      "source": "ASHBY",
+      "slug": "humaans",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Human Archive",
+      "source": "ASHBY",
+      "slug": "humanarchive",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Huntress",
+      "source": "GREENHOUSE",
+      "slug": "huntress",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Hyperbound",
+      "source": "ASHBY",
+      "slug": "hyperbound",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "idler",
+      "source": "ASHBY",
+      "slug": "idler",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Imply",
+      "source": "GREENHOUSE",
+      "slug": "imply",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Infisical",
+      "source": "ASHBY",
+      "slug": "infisical",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "InfluxData",
+      "source": "ASHBY",
+      "slug": "influxdata",
+      "stage": "GROWTH",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Inkeep",
+      "source": "ASHBY",
+      "slug": "inkeep",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Inngest",
+      "source": "ASHBY",
+      "slug": "inngest",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Instacart",
+      "source": "GREENHOUSE",
+      "slug": "instacart",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Instawork",
+      "source": "GREENHOUSE",
+      "slug": "instawork",
+      "stage": "GROWTH",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Intercom",
+      "source": "GREENHOUSE",
+      "slug": "intercom",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Jiga",
+      "source": "ASHBY",
+      "slug": "jiga",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Juicebox",
+      "source": "ASHBY",
+      "slug": "juicebox",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Junction",
+      "source": "ASHBY",
+      "slug": "junction",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Justworks",
+      "source": "GREENHOUSE",
+      "slug": "justworks",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Kalshi",
+      "source": "ASHBY",
+      "slug": "kalshi",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Kastle",
+      "source": "ASHBY",
+      "slug": "kastle",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Knock",
+      "source": "ASHBY",
+      "slug": "knock",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Kombo",
+      "source": "ASHBY",
+      "slug": "kombo",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Labelbox",
+      "source": "GREENHOUSE",
+      "slug": "labelbox",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "LangChain",
+      "source": "ASHBY",
+      "slug": "langchain",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Langdock",
+      "source": "ASHBY",
+      "slug": "langdock",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Lapel",
+      "source": "ASHBY",
+      "slug": "lapel",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Lattice",
+      "source": "GREENHOUSE",
+      "slug": "lattice",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "LaunchDarkly",
+      "source": "GREENHOUSE",
+      "slug": "launchdarkly",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Legalist",
+      "source": "GREENHOUSE",
+      "slug": "legalist",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Legion Health",
+      "source": "ASHBY",
+      "slug": "legionhealth",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Lever Demo",
+      "source": "LEVER",
+      "slug": "leverdemo",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Lightdash",
+      "source": "ASHBY",
+      "slug": "lightdash",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Lightning",
+      "source": "ASHBY",
+      "slug": "lightning",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Linear",
+      "source": "ASHBY",
+      "slug": "linear",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "LiteLLM",
+      "source": "ASHBY",
+      "slug": "litellm",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "LiveFlow",
+      "source": "ASHBY",
+      "slug": "liveflow",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Living Carbon",
+      "source": "LEVER",
+      "slug": "livingcarbon",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Llamaindex",
+      "source": "ASHBY",
+      "slug": "llamaindex",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Lob",
+      "source": "GREENHOUSE",
+      "slug": "lob",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Lucis",
+      "source": "ASHBY",
+      "slug": "lucis",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Luminai",
+      "source": "ASHBY",
+      "slug": "luminai",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Lyft",
+      "source": "GREENHOUSE",
+      "slug": "lyft",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Mach9",
+      "source": "ASHBY",
+      "slug": "mach9",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Mashgin",
+      "source": "LEVER",
+      "slug": "mashgin",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Match Group",
+      "source": "LEVER",
+      "slug": "matchgroup",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "May Mobility",
+      "source": "GREENHOUSE",
+      "slug": "maymobility",
+      "stage": "GROWTH",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
     },
     {
       "name": "Mercor",
       "source": "ASHBY",
-      "slug": "mercor"
+      "slug": "mercor",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Mercura",
+      "source": "ASHBY",
+      "slug": "mercura",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Meru Health",
+      "source": "GREENHOUSE",
+      "slug": "meruhealth",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Metal",
+      "source": "ASHBY",
+      "slug": "metal",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Meticulous",
+      "source": "ASHBY",
+      "slug": "meticulous",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Metriport",
+      "source": "ASHBY",
+      "slug": "metriport",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Middesk",
+      "source": "ASHBY",
+      "slug": "middesk",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Mintlify",
+      "source": "ASHBY",
+      "slug": "mintlify",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Mixpanel",
+      "source": "GREENHOUSE",
+      "slug": "mixpanel",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Modal",
+      "source": "ASHBY",
+      "slug": "modal",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Modern Health",
+      "source": "GREENHOUSE",
+      "slug": "modernhealth",
+      "stage": "GROWTH",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Modern Treasury",
+      "source": "ASHBY",
+      "slug": "moderntreasury",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Momentic",
+      "source": "GREENHOUSE",
+      "slug": "momentic",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "MongoDB",
+      "source": "GREENHOUSE",
+      "slug": "mongodb",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Montecarlodata",
+      "source": "ASHBY",
+      "slug": "montecarlodata",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Multiply Labs",
+      "source": "LEVER",
+      "slug": "multiplylabs",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Mytos",
+      "source": "LEVER",
+      "slug": "mytos",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Neon",
+      "source": "ASHBY",
+      "slug": "neon",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Netlify",
+      "source": "GREENHOUSE",
+      "slug": "netlify",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Netskope",
+      "source": "GREENHOUSE",
+      "slug": "netskope",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Nira Energy",
+      "source": "GREENHOUSE",
+      "slug": "niraenergy",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Nomic Bio",
+      "source": "ASHBY",
+      "slug": "nomic",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Notabene",
+      "source": "ASHBY",
+      "slug": "notabene",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Notion",
+      "source": "ASHBY",
+      "slug": "notion",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Nova Credit",
+      "source": "GREENHOUSE",
+      "slug": "novacredit",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Novig",
+      "source": "ASHBY",
+      "slug": "novig",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Numeral",
+      "source": "ASHBY",
+      "slug": "numeral",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Nuro",
+      "source": "GREENHOUSE",
+      "slug": "nuro",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Observeai",
+      "source": "GREENHOUSE",
+      "slug": "observeai",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "OffDeal",
+      "source": "ASHBY",
+      "slug": "offdeal",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Okta",
+      "source": "GREENHOUSE",
+      "slug": "okta",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "OneChronos",
+      "source": "ASHBY",
+      "slug": "onechronos",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Oneleet",
+      "source": "ASHBY",
+      "slug": "oneleet",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "OneSchema",
+      "source": "ASHBY",
+      "slug": "oneschema",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "OpenAI",
+      "source": "ASHBY",
+      "slug": "openai",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Ophelia",
+      "source": "GREENHOUSE",
+      "slug": "ophelia",
+      "stage": "GROWTH",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Orca",
+      "source": "GREENHOUSE",
+      "slug": "orca",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Outset",
+      "source": "ASHBY",
+      "slug": "outset",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Overview",
+      "source": "ASHBY",
+      "slug": "overview",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Padlet",
+      "source": "ASHBY",
+      "slug": "padlet",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "PagerDuty",
+      "source": "GREENHOUSE",
+      "slug": "pagerduty",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Pair Team",
+      "source": "GREENHOUSE",
+      "slug": "pairteam",
+      "stage": "GROWTH",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Parallel Bio",
+      "source": "GREENHOUSE",
+      "slug": "parallel",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Parameter",
+      "source": "ASHBY",
+      "slug": "parameter",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "People.ai",
+      "source": "LEVER",
+      "slug": "people-ai",
+      "stage": "GROWTH",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "PermitFlow",
+      "source": "ASHBY",
+      "slug": "permitflow",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Perplexity",
+      "source": "ASHBY",
+      "slug": "perplexity",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Phoenix",
+      "source": "ASHBY",
+      "slug": "phoenix",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Physicalintelligence",
+      "source": "ASHBY",
+      "slug": "physicalintelligence",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "PicnicAI",
+      "source": "GREENHOUSE",
+      "slug": "picnicai",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Pinecone",
+      "source": "ASHBY",
+      "slug": "pinecone",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Pinterest",
+      "source": "GREENHOUSE",
+      "slug": "pinterest",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Pirros",
+      "source": "ASHBY",
+      "slug": "pirros",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Planetscale",
+      "source": "GREENHOUSE",
+      "slug": "planetscale",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "PointOne",
+      "source": "ASHBY",
+      "slug": "pointone",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Poolside",
+      "source": "ASHBY",
+      "slug": "poolside",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Popl",
+      "source": "ASHBY",
+      "slug": "popl",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Porter",
+      "source": "LEVER",
+      "slug": "porter",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "PostEra",
+      "source": "LEVER",
+      "slug": "postera",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "PostHog",
+      "source": "ASHBY",
+      "slug": "posthog",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Postman",
+      "source": "GREENHOUSE",
+      "slug": "postman",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Postscript",
+      "source": "GREENHOUSE",
+      "slug": "postscript",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Prefect",
+      "source": "ASHBY",
+      "slug": "prefect",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Prelim",
+      "source": "ASHBY",
+      "slug": "prelim",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Probably Genetic",
+      "source": "ASHBY",
+      "slug": "probablygenetic",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Prodigal",
+      "source": "GREENHOUSE",
+      "slug": "prodigal",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Prolific",
+      "source": "GREENHOUSE",
+      "slug": "prolific",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Provision",
+      "source": "ASHBY",
+      "slug": "provision",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Pulse",
+      "source": "ASHBY",
+      "slug": "pulse",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Quicknode",
+      "source": "ASHBY",
+      "slug": "quicknode",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Quindar",
+      "source": "ASHBY",
+      "slug": "quindar",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Qventus",
+      "source": "GREENHOUSE",
+      "slug": "qventus",
+      "stage": "GROWTH",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "RADAR",
+      "source": "GREENHOUSE",
+      "slug": "radar",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Rally",
+      "source": "ASHBY",
+      "slug": "rallyuxr",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Ramp",
+      "source": "ASHBY",
+      "slug": "ramp",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Reach",
+      "source": "LEVER",
+      "slug": "reachpower",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Ready",
+      "source": "ASHBY",
+      "slug": "ready",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Reality Defender",
+      "source": "ASHBY",
+      "slug": "realitydefender",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Recall.ai",
+      "source": "GREENHOUSE",
+      "slug": "recall",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Reddit",
+      "source": "GREENHOUSE",
+      "slug": "reddit",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Reducto",
+      "source": "ASHBY",
+      "slug": "reducto",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Remote",
+      "source": "GREENHOUSE",
+      "slug": "remote",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Replit",
+      "source": "ASHBY",
+      "slug": "replit",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Replo",
+      "source": "ASHBY",
+      "slug": "replo",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Rescale",
+      "source": "ASHBY",
+      "slug": "rescale",
+      "stage": "GROWTH",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Resend",
+      "source": "ASHBY",
+      "slug": "resend",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Retell AI",
+      "source": "ASHBY",
+      "slug": "retell-ai",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "RevenueCat",
+      "source": "ASHBY",
+      "slug": "revenuecat",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Riot",
+      "source": "LEVER",
+      "slug": "tryriot",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Ro",
+      "source": "LEVER",
+      "slug": "ro",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Robinhood",
+      "source": "GREENHOUSE",
+      "slug": "robinhood",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Roblox",
+      "source": "GREENHOUSE",
+      "slug": "roblox",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Roboflow",
+      "source": "ASHBY",
+      "slug": "roboflow",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Rollstack",
+      "source": "ASHBY",
+      "slug": "rollstack",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Runway",
+      "source": "ASHBY",
+      "slug": "runway",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Rutter",
+      "source": "ASHBY",
+      "slug": "rutter",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "SalesPatriot",
+      "source": "ASHBY",
+      "slug": "salespatriot",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Salient",
+      "source": "ASHBY",
+      "slug": "salient",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Samsara",
+      "source": "GREENHOUSE",
+      "slug": "samsara",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Scale AI",
+      "source": "GREENHOUSE",
+      "slug": "scaleai",
+      "stage": "GROWTH",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Sendbird",
+      "source": "GREENHOUSE",
+      "slug": "sendbird",
+      "stage": "GROWTH",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Serif Health",
+      "source": "ASHBY",
+      "slug": "serifhealth",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Shadeform",
+      "source": "ASHBY",
+      "slug": "shadeform",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Shepherd",
+      "source": "ASHBY",
+      "slug": "shepherd",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Sierra",
+      "source": "ASHBY",
+      "slug": "sierra",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Sieve",
+      "source": "ASHBY",
+      "slug": "sieve",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "SigNoz",
+      "source": "ASHBY",
+      "slug": "signoz",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Simple AI",
+      "source": "ASHBY",
+      "slug": "simple-ai",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "SingleStore",
+      "source": "GREENHOUSE",
+      "slug": "singlestore",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Skyways",
+      "source": "LEVER",
+      "slug": "skyways",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "SnapMagic",
+      "source": "ASHBY",
+      "slug": "snapmagic",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Snappr",
+      "source": "LEVER",
+      "slug": "snappr",
+      "stage": "GROWTH",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "SoFi",
+      "source": "GREENHOUSE",
+      "slug": "sofi",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Solve Intelligence",
+      "source": "ASHBY",
+      "slug": "solveintelligence",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Spade",
+      "source": "ASHBY",
+      "slug": "spade",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Speak",
+      "source": "ASHBY",
+      "slug": "speak",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Spellbrush",
+      "source": "ASHBY",
+      "slug": "spellbrush",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Spotify",
+      "source": "LEVER",
+      "slug": "spotify",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "SpruceID",
+      "source": "ASHBY",
+      "slug": "spruceid",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Squarespace",
+      "source": "GREENHOUSE",
+      "slug": "squarespace",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Starburst",
+      "source": "GREENHOUSE",
+      "slug": "starburst",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Stepful",
+      "source": "ASHBY",
+      "slug": "stepful",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Stream",
+      "source": "ASHBY",
+      "slug": "stream",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Stripe",
+      "source": "GREENHOUSE",
+      "slug": "stripe",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Stytch",
+      "source": "ASHBY",
+      "slug": "stytch",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Suno",
+      "source": "ASHBY",
+      "slug": "suno",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Svix",
+      "source": "ASHBY",
+      "slug": "svix",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Swayable",
+      "source": "GREENHOUSE",
+      "slug": "swayable",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Swordhealth",
+      "source": "LEVER",
+      "slug": "swordhealth",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Tailor",
+      "source": "ASHBY",
+      "slug": "tailor",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Tailscale",
+      "source": "GREENHOUSE",
+      "slug": "tailscale",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Taktile",
+      "source": "ASHBY",
+      "slug": "taktile",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Tavus",
+      "source": "ASHBY",
+      "slug": "tavus",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "telli",
+      "source": "ASHBY",
+      "slug": "telli",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Tempo",
+      "source": "ASHBY",
+      "slug": "tempo",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Tennr",
+      "source": "ASHBY",
+      "slug": "tennr",
+      "stage": "GROWTH",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Terminal",
+      "source": "ASHBY",
+      "slug": "terminal",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Thera",
+      "source": "ASHBY",
+      "slug": "thera",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Thinking Machines",
+      "source": "ASHBY",
+      "slug": "thinkingmachines",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Thunkable",
+      "source": "LEVER",
+      "slug": "thunkable",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Titan",
+      "source": "ASHBY",
+      "slug": "titan",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Toast",
+      "source": "GREENHOUSE",
+      "slug": "toast",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Tovala",
+      "source": "LEVER",
+      "slug": "tovala",
+      "stage": "GROWTH",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Triomics",
+      "source": "ASHBY",
+      "slug": "triomics",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "TRM Labs",
+      "source": "ASHBY",
+      "slug": "trm-labs",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Twenty",
+      "source": "ASHBY",
+      "slug": "twenty",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Twilio",
+      "source": "GREENHOUSE",
+      "slug": "twilio",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Twitch",
+      "source": "GREENHOUSE",
+      "slug": "twitch",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Two Dots",
+      "source": "LEVER",
+      "slug": "twodots",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Uplane",
+      "source": "ASHBY",
+      "slug": "uplane",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Usul",
+      "source": "ASHBY",
+      "slug": "usul",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Vanta",
+      "source": "ASHBY",
+      "slug": "vanta",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Vapi",
+      "source": "ASHBY",
+      "slug": "vapi",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Vector",
+      "source": "ASHBY",
+      "slug": "vector",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Vercel",
+      "source": "GREENHOUSE",
+      "slug": "vercel",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "VergeSense",
+      "source": "LEVER",
+      "slug": "vergesense",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Verkada",
+      "source": "GREENHOUSE",
+      "slug": "verkada",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Verse Medical",
+      "source": "ASHBY",
+      "slug": "versemedical",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Vetcove",
+      "source": "ASHBY",
+      "slug": "vetcove",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Vitalize",
+      "source": "ASHBY",
+      "slug": "vitalize",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "voize",
+      "source": "ASHBY",
+      "slug": "voize",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Vooma",
+      "source": "ASHBY",
+      "slug": "vooma",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Vori",
+      "source": "ASHBY",
+      "slug": "vori",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Warp",
+      "source": "ASHBY",
+      "slug": "warp",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Watershed",
+      "source": "ASHBY",
+      "slug": "watershed",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Waymo",
+      "source": "GREENHOUSE",
+      "slug": "waymo",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Weaviate",
+      "source": "ASHBY",
+      "slug": "weaviate",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Workos",
+      "source": "ASHBY",
+      "slug": "workos",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "World Labs",
+      "source": "ASHBY",
+      "slug": "worldlabs",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Yugabyte",
+      "source": "GREENHOUSE",
+      "slug": "yugabyte",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Zed",
+      "source": "ASHBY",
+      "slug": "zed",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Zensors",
+      "source": "ASHBY",
+      "slug": "zensors",
+      "stage": "SEED",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "HOST_VERIFIED"
+    },
+    {
+      "name": "Ziina",
+      "source": "ASHBY",
+      "slug": "ziina",
+      "stage": "SERIES_B_PLUS",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "Zippi",
+      "source": "LEVER",
+      "slug": "zippi",
+      "stage": "SERIES_A",
+      "stageSource": "YC_DIRECTORY",
+      "stageAsOf": "2026-10-17",
+      "matchConfidence": "SLUG_NAME_MATCH"
+    },
+    {
+      "name": "ZoomInfo",
+      "source": "GREENHOUSE",
+      "slug": "zoominfo",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
+    },
+    {
+      "name": "Zscaler",
+      "source": "GREENHOUSE",
+      "slug": "zscaler",
+      "stage": "UNKNOWN",
+      "stageSource": "MANUAL",
+      "stageAsOf": "2026-10-17"
     }
   ]
 }

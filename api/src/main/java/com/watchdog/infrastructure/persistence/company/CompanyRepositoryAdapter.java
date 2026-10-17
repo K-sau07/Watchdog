@@ -3,6 +3,8 @@ package com.watchdog.infrastructure.persistence.company;
 import com.watchdog.domain.id.CompanyId;
 import com.watchdog.domain.model.AtsSource;
 import com.watchdog.domain.model.Company;
+import com.watchdog.domain.model.FundingStage;
+import com.watchdog.domain.model.StageSource;
 import com.watchdog.domain.port.CompanyRepository;
 import org.springframework.stereotype.Component;
 
@@ -58,12 +60,17 @@ class CompanyRepositoryAdapter implements CompanyRepository {
     private static CompanyRow toRow(Company c, boolean isNew) {
         return new CompanyRow(
                 c.id().value(), c.name(), c.atsSource().name(), c.atsSlug(),
-                c.active(), c.lastPolledAt(), isNew);
+                c.active(), c.lastPolledAt(),
+                c.fundingStage().name(), c.stageSource().name(), c.stageAsOf(),
+                isNew);
     }
 
     private static Company toDomain(CompanyRow r) {
         return new Company(
                 CompanyId.of(r.getId()), r.getName(), AtsSource.valueOf(r.getAtsSource()),
-                r.getAtsSlug(), r.isActive(), r.getLastPolledAt());
+                r.getAtsSlug(), r.isActive(), r.getLastPolledAt(),
+                FundingStage.parseOrUnknown(r.getFundingStage()),
+                StageSource.parseOrUnknown(r.getStageSource()),
+                r.getStageAsOf());
     }
 }

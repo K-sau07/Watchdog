@@ -5,6 +5,7 @@ import com.watchdog.domain.id.CompanyId;
 import com.watchdog.domain.id.PostingId;
 import com.watchdog.domain.model.AtsSource;
 import com.watchdog.domain.model.EmploymentType;
+import com.watchdog.domain.model.FundingStage;
 import com.watchdog.domain.model.Posting;
 import com.watchdog.domain.model.RemoteType;
 import com.watchdog.domain.model.Salary;
@@ -47,7 +48,8 @@ class PostingControllerTest {
                 EmploymentType.FULL_TIME, Salary.of(new BigDecimal("120000"), new BigDecimal("150000"), "USD"),
                 "https://x/y", "Great role. Visa sponsorship available.",
                 SponsorshipSignal.OFFERED, NOW.minus(Duration.ofMinutes(4)), NOW, null);
-        return new MatchingService.MatchedPosting(p, Seniority.NEW_GRAD, AtsSource.GREENHOUSE, "Ramp");
+        return new MatchingService.MatchedPosting(p, Seniority.NEW_GRAD, AtsSource.GREENHOUSE, "Ramp",
+                FundingStage.SERIES_A);
     }
 
     @Test

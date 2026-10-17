@@ -17,6 +17,25 @@ function rampColor(t: Temperature): { edge: string; stamp: string; glow: string;
   }
 }
 
+/**
+ * Funding stage as it appears on a card. Returns null for UNKNOWN and for a missing
+ * company: a blank badge would read as a claim, and no stage on record is not a stage.
+ */
+function stageLabel(stage: string | null): string | null {
+  switch (stage) {
+    case 'SEED':
+      return 'seed'
+    case 'SERIES_A':
+      return 'series A'
+    case 'SERIES_B_PLUS':
+      return 'series B+'
+    case 'GROWTH':
+      return 'late stage'
+    default:
+      return null
+  }
+}
+
 export interface JobCardProps {
   posting: PostingSummary
   /** Current per-user state (drives applied/saved treatment); NEW when untouched. */
@@ -32,6 +51,7 @@ export function JobCard({ posting, state = 'NEW', onState, justArrived = false }
   const salary = formatSalary(posting.salary)
   const sponsor = sponsorshipBadge(posting.sponsorshipSignal)
   const src = sourceTag(posting.source)
+  const stage = stageLabel(posting.fundingStage)
   const applied = state === 'APPLIED'
 
   return (
@@ -74,6 +94,11 @@ export function JobCard({ posting, state = 'NEW', onState, justArrived = false }
 
       {/* row 3: badges */}
       <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px]">
+        {stage ? (
+          <span className="rounded-full border border-line-strong px-2 py-0.5 text-[11px] font-medium text-text-mid">
+            {stage}
+          </span>
+        ) : null}
         {salary ? <span className="font-mono text-text-hi">{salary}</span> : null}
         <span style={{ color: sponsorTone(sponsor.tone) }}>{sponsor.label}</span>
         {posting.seniority && posting.seniority !== 'UNKNOWN' ? (

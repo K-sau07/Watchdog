@@ -6,6 +6,7 @@ import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.UUID;
 
 /**
@@ -26,18 +27,25 @@ class CompanyRow implements Persistable<UUID> {
     private final String atsSlug;
     private final boolean active;
     private final Instant lastPolledAt;
+    private final String fundingStage;
+    private final String stageSource;
+    private final LocalDate stageAsOf;
 
     @Transient
     private final boolean isNew;
 
     CompanyRow(UUID id, String name, String atsSource, String atsSlug,
-               boolean active, Instant lastPolledAt, boolean isNew) {
+               boolean active, Instant lastPolledAt, String fundingStage,
+               String stageSource, LocalDate stageAsOf, boolean isNew) {
         this.id = id;
         this.name = name;
         this.atsSource = atsSource;
         this.atsSlug = atsSlug;
         this.active = active;
         this.lastPolledAt = lastPolledAt;
+        this.fundingStage = fundingStage;
+        this.stageSource = stageSource;
+        this.stageAsOf = stageAsOf;
         this.isNew = isNew;
     }
 
@@ -53,6 +61,18 @@ class CompanyRow implements Persistable<UUID> {
 
     String getName() {
         return name;
+    }
+
+    String getFundingStage() {
+        return fundingStage;
+    }
+
+    String getStageSource() {
+        return stageSource;
+    }
+
+    LocalDate getStageAsOf() {
+        return stageAsOf;
     }
 
     String getAtsSource() {

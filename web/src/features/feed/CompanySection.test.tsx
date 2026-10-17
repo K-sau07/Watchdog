@@ -8,7 +8,7 @@ function role(id: string): PostingSummary {
   return {
     id, title: `Role ${id}`, companyName: 'Stripe', location: null, remoteType: 'REMOTE',
     employmentType: 'FULL_TIME', seniority: 'MID', sponsorshipSignal: 'UNKNOWN',
-    salary: null, url: null, source: 'GREENHOUSE', postedAt: null,
+    salary: null, url: null, source: 'GREENHOUSE', fundingStage: null, postedAt: null,
     firstSeenAt: '2026-09-08T12:00:00Z', caughtMinutes: null,
   }
 }

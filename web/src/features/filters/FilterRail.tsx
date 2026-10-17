@@ -6,6 +6,18 @@ const SENIORITY = ['INTERN', 'NEW_GRAD', 'JUNIOR', 'MID', 'SENIOR'] as const
 const REMOTE = ['REMOTE', 'HYBRID', 'ONSITE'] as const
 const EMPLOYMENT = ['FULL_TIME', 'INTERNSHIP', 'CONTRACT', 'PART_TIME'] as const
 const SOURCE = ['GREENHOUSE', 'LEVER', 'ASHBY'] as const
+/**
+ * Funding stage — the dimension this whole tool exists for, so it sits at the top of the
+ * rail rather than down with the plumbing. Labels are written out because the enum names
+ * ("SERIES_B_PLUS") read as database values, not as something you pick.
+ */
+const STAGE = [
+  { value: 'SEED', label: 'seed' },
+  { value: 'SERIES_A', label: 'series A' },
+  { value: 'SERIES_B_PLUS', label: 'series B+' },
+  { value: 'GROWTH', label: 'late stage' },
+  { value: 'UNKNOWN', label: 'unverified' },
+] as const
 const STATE = ['NEW', 'SAVED', 'APPLIED', 'HIDDEN'] as const
 const POSTED_WITHIN = [
   { token: '10m', label: '10 min' },
@@ -69,6 +81,14 @@ export function FilterRail({ value, onChange, onReset }: FilterRailProps) {
         />
       </div>
 
+      <ChipGroup
+        label="company stage"
+        hint="unverified = no stage claim on record, not an early one"
+        options={STAGE.map((o) => ({ value: o.value, label: o.label }))}
+        selected={value.stages}
+        onToggle={(v) => toggle('stages', v)}
+      />
+
       <ChipGroup label="seniority" options={SENIORITY.map((v) => ({ value: v, label: human(v) }))} selected={value.seniority} onToggle={(v) => toggle('seniority', v)} />
       <ChipGroup label="remote" options={REMOTE.map((v) => ({ value: v, label: human(v) }))} selected={value.remote} onToggle={(v) => toggle('remote', v)} />
       <ChipGroup label="type" options={EMPLOYMENT.map((v) => ({ value: v, label: human(v) }))} selected={value.employmentType} onToggle={(v) => toggle('employmentType', v)} />
@@ -110,11 +130,14 @@ function Chip({ label, active, onClick }: { label: string; active: boolean; onCl
 
 function ChipGroup({
   label,
+  hint,
   options,
   selected,
   onToggle,
 }: {
   label: string
+  /** Optional one-line clarification under the label, for dimensions that can mislead. */
+  hint?: string
   options: { value: string; label: string }[]
   selected: string[]
   onToggle: (value: string) => void
@@ -122,6 +145,7 @@ function ChipGroup({
   return (
     <div>
       <FieldLabel>{label}</FieldLabel>
+      {hint ? <span className="mb-1.5 -mt-1 block text-[11px] text-text-lo">{hint}</span> : null}
       <div className="flex flex-wrap gap-1.5">
         {options.map((o) => (
           <Chip key={o.value} label={o.label} active={selected.includes(o.value)} onClick={() => onToggle(o.value)} />
