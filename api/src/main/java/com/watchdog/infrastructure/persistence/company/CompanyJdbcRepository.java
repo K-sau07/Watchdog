@@ -1,7 +1,11 @@
 package com.watchdog.infrastructure.persistence.company;
 
+import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
+
+import java.time.Instant;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,4 +24,17 @@ interface CompanyJdbcRepository extends CrudRepository<CompanyRow, UUID> {
     List<CompanyRow> findAllActive();
 
     long countByAtsSource(String atsSource);
+
+    /**
+     * Records when we started watching this board, once and only once.
+     *
+     * <p>The {@code IS NULL} guard is the whole contract: first_polled_at is the fixed
+     * point every catch-time is measured against, so a later poll must never move it.
+     * Kept out of {@link CompanyRow} deliberately — a mapped column would be rewritten
+     * on every save, which is exactly the overwrite this guards against.
+     */
+    @Modifying
+    @Query("UPDATE company SET first_polled_at = :when "
+            + "WHERE id = :id AND first_polled_at IS NULL")
+    int stampFirstPolledIfAbsent(@Param("id") UUID id, @Param("when") Instant when);
 }

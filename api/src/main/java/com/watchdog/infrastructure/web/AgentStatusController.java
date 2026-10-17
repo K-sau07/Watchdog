@@ -31,7 +31,17 @@ class AgentStatusController {
         this.onDemandPoll = onDemandPoll;
     }
 
-    /** Response DTO: null poll times before first poll; null median when unknown today. */
+    /**
+     * Response DTO: null poll times before first poll; null median when nothing was
+     * genuinely caught today.
+     *
+     * <p>{@code newToday} and {@code caughtToday} are different numbers and the client
+     * must be able to tell them apart. The first counts every posting written today,
+     * backfill included. The second counts only those posted after we started watching
+     * their board — the population the median is computed over. When a big backfill
+     * lands, the first is large and the second can be zero, and reporting one figure
+     * would make the median look like it describes all of them.
+     */
     record StatusResponse(
             int boardsWatched,
             long greenhouse,
@@ -40,13 +50,15 @@ class AgentStatusController {
             Instant lastPoll,
             Instant nextPoll,
             int newToday,
-            Long medianCatchMinutesToday
+            Long medianCatchMinutesToday,
+            int caughtToday
     ) {
         static StatusResponse from(AgentStatus s) {
             return new StatusResponse(
                     s.boardsWatched(), s.greenhouse(), s.lever(), s.ashby(),
                     s.lastPoll(), s.nextPoll(), s.newToday(),
-                    s.medianCatchTimeToday().map(java.time.Duration::toMinutes).orElse(null));
+                    s.medianCatchTimeToday().map(java.time.Duration::toMinutes).orElse(null),
+                    s.caughtToday());
         }
     }
 

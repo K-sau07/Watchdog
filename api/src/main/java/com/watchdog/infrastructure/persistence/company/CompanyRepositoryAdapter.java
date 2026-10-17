@@ -29,6 +29,12 @@ class CompanyRepositoryAdapter implements CompanyRepository {
     public Company save(Company company) {
         boolean isNew = !jdbc.existsById(company.id().value());
         CompanyRow saved = jdbc.save(toRow(company, isNew));
+        // A board that has just been polled gets its watch-start stamped if it has none.
+        // The domain has no business knowing about this — it is the anchor the catch-time
+        // statistics measure against, not a rule anything in the model acts on.
+        if (company.lastPolledAt() != null) {
+            jdbc.stampFirstPolledIfAbsent(company.id().value(), company.lastPolledAt());
+        }
         return toDomain(saved);
     }
 

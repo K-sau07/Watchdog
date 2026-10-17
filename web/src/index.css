@@ -1,80 +1,99 @@
 @import "tailwindcss";
 
 /*
- * Watchdog design tokens — from docs/02_WATCHDOG_UI_BIBLE.md (§2 color, §3 type).
- * Tailwind v4 CSS-first: tokens live in @theme so they're available as utilities
- * (bg-void, text-hi, font-mono, ...) and as raw CSS vars. Dark-first, no light mode
- * (G-UI4): the palette IS the design, not an inversion.
+ * Watchdog design tokens.
+ *
+ * Light, near-white, one mint accent — the system the product is being rebuilt
+ * against. Values are measured, not guessed: they were read out of the shipped
+ * stylesheets of the reference product (40 CSS bundles, see docs/02_WATCHDOG_UI_BIBLE.md
+ * for the capture), so #00f0a0, #f3f4f5 and the rgba(0,0,0,.45) text step are the
+ * real figures rather than something eyeballed off a screenshot.
+ *
+ * This replaces the previous dark/amber palette. That was a deliberate design with
+ * its own rationale; it was retired on purpose, not lost.
  */
 
-/* Fonts — humanist-technical pairing (G-UI1). */
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,400;9..144,500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
 
 @theme {
-  /* Surfaces — deep charcoal, not pure black (halation on moving content). */
-  --color-void: #0a0b0d;
-  --color-surface: #121418;
-  --color-card: #16191e;
-  --color-card-hover: #1c2027;
-  --color-line: #24282f;
-  --color-line-strong: #333941;
+  /* Surfaces, lightest to heaviest. */
+  --color-page: #f3f4f5;
+  --color-surface: #ffffff;
+  --color-rail: #f7f8f9;
+  --color-sunken: #f2f4f5;
+  --color-hover: #f0f1f2;
 
-  /* Text steps. */
-  --color-text-hi: #eceef2;
-  --color-text-mid: #a7adb8;
-  --color-text-lo: #6b717c;
+  /* The near-black panel that carries the one number worth staring at. */
+  --color-panel: #0a1014;
 
-  /* Amber — THE accent, two temperatures (G-UI0). */
-  --color-amber: #ffb020;
-  --color-amber-hot: #ffd36b;
-  --color-amber-dim: #b87a16;
+  /* Hairlines. Two weights: a barely-there divider and a real border. */
+  --color-line: rgba(0, 0, 0, 0.06);
+  --color-line-strong: rgba(0, 0, 0, 0.1);
 
-  /* Semantic — muted on purpose; never competes with amber. */
-  --color-ok: #4db27a;
-  --color-warn: #c77d3a;
-  --color-danger: #c7534a;
-  --color-badge: #2a2f37;
+  /* Text steps. Opacity on black, which is how the reference does it — it keeps
+     text sitting on any surface tint without a second palette. */
+  --color-text-hi: #000000;
+  --color-text-mid: rgba(0, 0, 0, 0.65);
+  --color-text-lo: rgba(0, 0, 0, 0.45);
+  --color-text-faint: rgba(0, 0, 0, 0.3);
+  --color-on-panel: #ffffff;
+
+  /* Mint — THE accent. Used for primary actions and active filter state, nothing else. */
+  --color-mint: #00f0a0;
+  --color-mint-ink: #003d29;
+  --color-mint-soft: rgba(0, 240, 160, 0.1);
+  --color-mint-edge: rgba(0, 240, 160, 0.25);
+
+  /* Semantic. */
+  --color-danger: #ff465a;
+  --color-danger-soft: rgba(255, 70, 90, 0.1);
+  --color-info: #14c8f0;
+  --color-badge: #f2f4f5;
 
   /* Type roles. */
-  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
-  --font-voice: "Fraunces", ui-serif, Georgia, serif;
+  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+
+  /* Radii, measured from the reference: 8 is the default, 16 is a card, pills are 999. */
+  --radius-control: 8px;
+  --radius-card: 16px;
+  --radius-pill: 999px;
 }
 
-/* Raw values used as shadow/bg (not @theme colors). */
 :root {
-  --amber-glow: rgba(255, 176, 32, 0.16);
-  --amber-glow-hot: rgba(255, 211, 107, 0.28);
-  color-scheme: dark;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-raised: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --mint-glow: rgba(0, 240, 160, 0.25);
+  color-scheme: light;
 }
 
 html,
 body {
   margin: 0;
   min-height: 100vh;
-  background: var(--color-void);
+  background: var(--color-page);
   color: var(--color-text-hi);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
 }
 
-/* Visible keyboard focus everywhere (a11y floor, constitution §7) — amber ring on
- * keyboard focus only, never on mouse click. Applies to buttons, inputs, links. */
+/* Visible keyboard focus everywhere (a11y floor, constitution §7) — on keyboard
+ * focus only, never on mouse click. Applies to buttons, inputs, links. */
 :focus-visible {
-  outline: 2px solid var(--color-amber);
+  outline: 2px solid var(--color-mint);
   outline-offset: 2px;
-  border-radius: 3px;
+  border-radius: 4px;
 }
 :focus:not(:focus-visible) {
   outline: none;
 }
 
-/* The one orchestrated motion moment (bible §6): a fresh arrival pulses hot->steady once. */
+/* The one orchestrated motion moment: a fresh arrival pulses once and settles. */
 @keyframes fresh-pulse {
-  0% { box-shadow: 0 0 0 0 var(--amber-glow-hot); }
-  60% { box-shadow: 0 0 18px 2px var(--amber-glow-hot); }
-  100% { box-shadow: 0 0 10px 0 var(--amber-glow); }
+  0% { box-shadow: 0 0 0 0 var(--mint-glow); }
+  60% { box-shadow: 0 0 0 6px var(--mint-glow); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 240, 160, 0); }
 }
 
 /* The "watching" heartbeat — slow breath on the live dot. */

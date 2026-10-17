@@ -23,6 +23,8 @@ class RetentionServiceTest {
     private static class CapturingRepo implements PostingRepository {
         Instant cutoffSeen;
         int toReturn;
+        /** Unused here: nothing in this suite reads catch-time statistics. */
+        @Override public List<Posting> findCaughtSince(java.time.Instant since) { return List.of(); }
         @Override public int deleteStalePostedBefore(Instant cutoff) { cutoffSeen = cutoff; return toReturn; }
         // unused
         @Override public Posting save(Posting p) { return p; }

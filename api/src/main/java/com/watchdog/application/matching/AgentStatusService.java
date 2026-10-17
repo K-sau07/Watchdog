@@ -60,9 +60,17 @@ public class AgentStatusService {
                 .orElse(null);
         Instant nextPoll = lastPoll == null ? null : lastPoll.plusMillis(pollIntervalMs);
 
-        // Today's window (start of the current UTC day) → new count + median catch-time.
+        // Today's window (start of the current UTC day).
         Instant startOfDay = now.truncatedTo(ChronoUnit.DAYS);
+
+        // Two different questions, two different queries. "How many did we write today"
+        // includes backfill — that is an honest count of work done. "How fast do we
+        // catch things" must not: a board's first poll imports roles posted months
+        // earlier, and folding those into the median produced a headline reading
+        // "88 days" off 364 mostly-backfilled boards. Correct arithmetic over the wrong
+        // population is still the wrong number.
         List<Posting> today = postings.findSeenSince(startOfDay);
+        List<Posting> caughtToday = postings.findCaughtSince(startOfDay);
 
         return new AgentStatus(
                 active.size(),
@@ -72,12 +80,15 @@ public class AgentStatusService {
                 lastPoll,
                 nextPoll,
                 today.size(),
-                medianCatchTime(today));
+                medianCatchTime(caughtToday),
+                caughtToday.size());
     }
 
     /**
-     * Median catch-time across today's postings that have a known postedAt. Empty when
-     * none do — honest, never faked (spec §8.4). Same method as the poll cycle uses.
+     * Median catch-time across the postings handed in. Callers must pass only genuine
+     * catches ({@link PostingRepository#findCaughtSince}); this method does not and
+     * cannot tell backfill apart. Empty when the list is empty — honest, never faked
+     * (spec §8.4).
      */
     private static Optional<Duration> medianCatchTime(List<Posting> today) {
         List<Duration> catches = today.stream()
@@ -109,6 +120,7 @@ public class AgentStatusService {
             Instant lastPoll,
             Instant nextPoll,
             int newToday,
-            Optional<Duration> medianCatchTimeToday
+            Optional<Duration> medianCatchTimeToday,
+            int caughtToday
     ) {}
 }

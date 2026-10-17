@@ -1,4 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { screen, fireEvent } from '@testing-library/react'
+import { renderWithQuery as render } from '../../test/renderWithQuery'
 import { describe, it, expect, vi } from 'vitest'
 import { FeedList } from './FeedList'
 import type { PostingSummary } from '../../lib/api'
@@ -56,7 +57,7 @@ describe('FeedList', () => {
     const onState = vi.fn()
     render(<FeedList {...base} postings={[posting]} onState={onState} />)
     expect(screen.getByRole('heading', { name: /software engineer/i })).toBeInTheDocument()
-    fireEvent.click(screen.getByText('save'))
+    fireEvent.click(screen.getByLabelText(/save this posting/i))
     expect(onState).toHaveBeenCalledWith('p1', 'SAVED')
   })
 

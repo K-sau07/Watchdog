@@ -56,6 +56,12 @@ export interface AgentStatus {
   nextPoll: string | null;
   newToday: number;
   medianCatchMinutesToday: number | null;
+  /**
+   * Postings written today that were posted *after* we started watching their board —
+   * the population the median describes. Smaller than newToday whenever a backfill
+   * landed, and zero on a day that was all backfill.
+   */
+  caughtToday: number;
 }
 
 /** Mirrors FilterProfileDtos.ProfileResponse. */
@@ -188,5 +194,147 @@ export function updateProfile(
   return request<FilterProfile>(`/api/filter-profiles/${id}`, {
     method: 'PUT',
     body: JSON.stringify(body),
+  });
+}
+
+// --- outreach ---
+
+/**
+ * Where a person stands, in the vocabulary of SaurabhBrain/Pipeline/core/STAGES.md.
+ *
+ * Derived from the event log rather than stored, except ASKED / WON / DEAD / NURTURE,
+ * which a human declares — nothing in a log says "they sounded irritated".
+ */
+export type OutreachStage =
+  | 'REACHED_OUT'
+  | 'LIVE'
+  | 'EXCHANGE'
+  | 'ASKED'
+  | 'WON'
+  | 'NURTURE'
+  | 'DEAD';
+
+/** What this person can give. Decides the shape of the stage-5 ask (ROUTER.md). */
+export type CanGive = 'REFER' | 'INTERVIEW' | 'ROUTE';
+
+/** Who they are. Sets register and research depth, not the ask (ROUTER.md). */
+export type PersonType =
+  | 'ENGINEER'
+  | 'RECRUITER'
+  | 'HIRING_MANAGER'
+  | 'ALUM'
+  | 'SENIOR_OFF_REQ';
+
+/**
+ * LINKEDIN_INVITE is separate from LINKEDIN_DM because an invite is not a message and
+ * must not be charged against the unanswered cap.
+ */
+export type Channel = 'LINKEDIN_INVITE' | 'LINKEDIN_DM' | 'EMAIL';
+
+export interface OutreachPerson {
+  id: string;
+  companyName: string;
+  personName: string;
+  personTitle: string | null;
+  linkedinUrl: string | null;
+  email: string | null;
+  personType: PersonType | null;
+  canGive: CanGive | null;
+  stage: OutreachStage;
+  /** True when a human stated the stage rather than it being derived. */
+  stageDeclared: boolean;
+  turns: number;
+  /** The worst channel's unanswered count — the cap is per channel. */
+  unanswered: number;
+  channelsTouched: Channel[];
+  unansweredPerChannel: Partial<Record<Channel, number>>;
+  reachedOutAt: string;
+  lastOutboundAt: string | null;
+  lastInboundAt: string | null;
+  /** Null unless a chase is owed; otherwise the channel to send it on. */
+  followUpDueOn: Channel | null;
+  postingId: string | null;
+}
+
+/** One company tag, its roster, and the two groups the board splits into. */
+export interface OutreachCompany {
+  companyName: string;
+  fundingStage: string | null;
+  /** People we aim to reach at each company. */
+  target: number;
+  invited: number;
+  emailed: number;
+  awaitingReply: OutreachPerson[];
+  inConversation: OutreachPerson[];
+}
+
+/** This week's spend against the invite allowance. */
+export interface OutreachPace {
+  invitesSent: number;
+  inviteCap: number;
+  companiesTouched: number;
+  companiesTarget: number;
+  invitesBurned: boolean;
+}
+
+export function fetchOutreach(): Promise<OutreachCompany[]> {
+  return request<OutreachCompany[]>('/api/outreach');
+}
+
+export function fetchFollowUps(): Promise<OutreachPerson[]> {
+  return request<OutreachPerson[]>('/api/outreach/follow-ups');
+}
+
+export function fetchPace(): Promise<OutreachPace> {
+  return request<OutreachPace>('/api/outreach/pace');
+}
+
+/** Put someone on a roster and record the first touch in one call. */
+export function targetPerson(input: {
+  companyName: string;
+  personName: string;
+  personTitle?: string | null;
+  linkedinUrl?: string | null;
+  email?: string | null;
+  personType?: PersonType | null;
+  postingId?: string | null;
+  channel?: Channel;
+  kind?: string;
+}): Promise<OutreachPerson> {
+  return request<OutreachPerson>('/api/outreach', {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+}
+
+/** Record a touch or a reply against someone already on a roster. */
+export function recordEvent(
+  id: string,
+  input: {
+    direction?: 'OUTBOUND' | 'INBOUND';
+    channel?: Channel;
+    kind?: string;
+    status?: 'DRAFTED' | 'SENT';
+    body?: string | null;
+  },
+): Promise<OutreachPerson> {
+  return request<OutreachPerson>(`/api/outreach/${encodeURIComponent(id)}/events`, {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+}
+
+export function patchContact(
+  id: string,
+  patch: {
+    stageOverride?: OutreachStage | null;
+    canGive?: CanGive | null;
+    email?: string | null;
+    personType?: PersonType | null;
+  },
+): Promise<OutreachPerson> {
+  return request<OutreachPerson>(`/api/outreach/${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    body: JSON.stringify(patch),
   });
 }

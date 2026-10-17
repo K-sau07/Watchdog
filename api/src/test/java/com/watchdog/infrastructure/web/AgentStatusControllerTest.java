@@ -37,7 +37,7 @@ class AgentStatusControllerTest {
     void statusExposesCountsAndMedianMinutes() throws Exception {
         when(agentStatus.current()).thenReturn(new AgentStatus(
                 25, 16, 2, 7, NOW.minus(Duration.ofSeconds(38)),
-                NOW.plus(Duration.ofSeconds(82)), 12, Optional.of(Duration.ofMinutes(6))));
+                NOW.plus(Duration.ofSeconds(82)), 12, Optional.of(Duration.ofMinutes(6)), 9));
 
         mockMvc.perform(get("/api/agent/status"))
                 .andExpect(status().isOk())
@@ -45,13 +45,16 @@ class AgentStatusControllerTest {
                 .andExpect(jsonPath("$.greenhouse").value(16))
                 .andExpect(jsonPath("$.ashby").value(7))
                 .andExpect(jsonPath("$.newToday").value(12))
-                .andExpect(jsonPath("$.medianCatchMinutesToday").value(6));
+                .andExpect(jsonPath("$.medianCatchMinutesToday").value(6))
+                // Separate from newToday on purpose: 12 postings were written today, 9
+                // of them were genuinely caught, and the median describes only those.
+                .andExpect(jsonPath("$.caughtToday").value(9));
     }
 
     @Test
     void nullsBeforeFirstPollAndUnknownMedian() throws Exception {
         when(agentStatus.current()).thenReturn(new AgentStatus(
-                25, 16, 2, 7, null, null, 0, Optional.empty()));
+                25, 16, 2, 7, null, null, 0, Optional.empty(), 0));
 
         mockMvc.perform(get("/api/agent/status"))
                 .andExpect(status().isOk())

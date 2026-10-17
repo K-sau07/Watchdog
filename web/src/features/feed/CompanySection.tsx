@@ -40,7 +40,7 @@ export function CompanySection({ group, onState, freshIds }: CompanySectionProps
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={expanded}
-        className="flex w-full items-center justify-between px-4 py-3 text-left transition-colors hover:bg-card-hover"
+        className="flex w-full items-center justify-between px-4 py-3 text-left transition-colors hover:bg-hover"
       >
         <span className="flex items-center gap-2">
           <span className="font-display text-[16px] font-medium text-text-hi">{group.company}</span>
@@ -48,7 +48,7 @@ export function CompanySection({ group, onState, freshIds }: CompanySectionProps
             {group.roles.length} roles
           </span>
           {hasFresh ? (
-            <span className="rounded-full px-2 py-0.5 text-[11px]" style={{ background: 'var(--amber-glow)', color: 'var(--color-amber)' }}>
+            <span className="rounded-pill bg-mint-soft px-2 py-0.5 text-[11px] font-medium text-mint-ink">
               new
             </span>
           ) : null}

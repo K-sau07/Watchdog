@@ -1,4 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { screen, fireEvent } from '@testing-library/react'
+import { renderWithQuery as render } from '../../test/renderWithQuery'
 import { describe, it, expect } from 'vitest'
 import { CompanySection } from './CompanySection'
 import type { CompanyGroup } from '../../lib/grouping'

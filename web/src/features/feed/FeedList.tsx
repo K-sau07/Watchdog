@@ -40,7 +40,7 @@ export function FeedList({
         <button
           type="button"
           onClick={onRetry}
-          className="mt-3 rounded border border-line px-3 py-1 text-sm text-text-mid transition-colors hover:bg-card-hover"
+          className="mt-3 rounded border border-line px-3 py-1 text-sm text-text-mid transition-colors hover:bg-hover"
         >
           retry
         </button>
@@ -64,7 +64,7 @@ export function FeedList({
         <button
           type="button"
           onClick={onResetFilters}
-          className="mt-3 rounded border border-line px-3 py-1 text-sm text-text-mid transition-colors hover:bg-card-hover"
+          className="mt-3 rounded border border-line px-3 py-1 text-sm text-text-mid transition-colors hover:bg-hover"
         >
           reset filters
         </button>
@@ -92,7 +92,7 @@ export function FeedList({
           type="button"
           onClick={onLoadMore}
           disabled={isFetchingMore}
-          className="mt-2 self-center rounded border border-line px-5 py-2 text-[13px] text-text-mid transition-colors hover:bg-card-hover disabled:opacity-50"
+          className="mt-2 self-center rounded border border-line px-5 py-2 text-[13px] text-text-mid transition-colors hover:bg-hover disabled:opacity-50"
         >
           {isFetchingMore ? 'loading…' : 'load more'}
         </button>

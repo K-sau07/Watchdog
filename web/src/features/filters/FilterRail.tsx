@@ -80,7 +80,7 @@ export function FilterRail({ value, onChange, onReset, showHeading = true }: Fil
           <button
             type="button"
             onClick={onReset}
-            className="text-[12px] text-text-lo transition-colors hover:text-amber"
+            className="text-[12px] text-text-lo transition-colors hover:text-text-hi"
           >
             reset ({count})
           </button>
@@ -150,8 +150,8 @@ function Chip({ label, active, onClick }: { label: string; active: boolean; onCl
       onClick={onClick}
       className="rounded-full border px-2.5 py-1 text-[12px] transition-colors"
       style={{
-        borderColor: active ? 'var(--color-amber-dim)' : 'var(--color-line)',
-        color: active ? 'var(--color-amber)' : 'var(--color-text-mid)',
+        borderColor: active ? 'var(--color-mint-edge)' : 'var(--color-line)',
+        color: active ? 'var(--color-text-hi)' : 'var(--color-text-mid)',
         background: active ? 'rgba(184,122,22,0.12)' : 'transparent',
       }}
     >
@@ -243,7 +243,7 @@ function TagInput({
               type="button"
               aria-label={`Remove ${t}`}
               onClick={() => onChange(tags.filter((x) => x !== t))}
-              className="rounded-full border border-amber-dim bg-[rgba(184,122,22,0.12)] px-2.5 py-1 text-[12px] text-amber"
+              className="rounded-full border border-mint-edge bg-mint-soft px-2.5 py-1 text-[12px] text-text-hi"
             >
               {t} ✕
             </button>
@@ -263,7 +263,7 @@ function TagInput({
           }
         }}
         onBlur={commit}
-        className="w-full rounded border border-line bg-card px-2.5 py-1.5 text-[13px] text-text-hi placeholder:text-text-lo focus:border-amber-dim focus:outline-none"
+        className="w-full rounded border border-line bg-surface px-2.5 py-1.5 text-[13px] text-text-hi placeholder:text-text-lo focus:border-mint focus:outline-none"
       />
     </div>
   )
@@ -291,7 +291,7 @@ function NumberInput({
           const n = e.target.value === '' ? null : Number(e.target.value)
           onChange(n !== null && Number.isFinite(n) ? n : null)
         }}
-        className="w-full rounded border border-line bg-card px-2.5 py-1.5 font-mono text-[13px] text-text-hi placeholder:text-text-lo focus:border-amber-dim focus:outline-none"
+        className="w-full rounded border border-line bg-surface px-2.5 py-1.5 font-mono text-[13px] text-text-hi placeholder:text-text-lo focus:border-mint focus:outline-none"
       />
     </div>
   )

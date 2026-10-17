@@ -62,6 +62,8 @@ class PollingServiceTest {
         @Override public List<Posting> findSeenSince(Instant since) {
             return saved.stream().filter(p -> !p.firstSeenAt().isBefore(since)).toList();
         }
+        /** Unused here: nothing in this suite reads catch-time statistics. */
+        @Override public List<Posting> findCaughtSince(java.time.Instant since) { return List.of(); }
         @Override public int deleteStalePostedBefore(Instant cutoff) { return 0; }
     }
 

@@ -62,6 +62,8 @@ class JobStateServiceTest {
         @Override public List<Posting> findByCompany(CompanyId c) { return List.of(); }
         @Override public List<Posting> findRecent(int limit) { return List.of(); }
         @Override public List<Posting> findSeenSince(java.time.Instant since) { return List.of(); }
+        /** Unused here: nothing in this suite reads catch-time statistics. */
+        @Override public List<Posting> findCaughtSince(java.time.Instant since) { return List.of(); }
         @Override public int deleteStalePostedBefore(java.time.Instant cutoff) { return 0; }
     }
 

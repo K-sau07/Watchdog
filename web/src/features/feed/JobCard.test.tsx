@@ -1,4 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { screen, fireEvent } from '@testing-library/react'
+import { renderWithQuery as render } from '../../test/renderWithQuery'
 import { describe, it, expect, vi } from 'vitest'
 import { JobCard } from './JobCard'
 import type { PostingSummary } from '../../lib/api'
@@ -25,14 +26,17 @@ describe('JobCard', () => {
   it('renders title, company meta, salary, and the catch stamp', () => {
     render(<JobCard posting={posting} />)
     expect(screen.getByRole('heading', { name: /software engineer, new grad/i })).toBeInTheDocument()
-    expect(screen.getByText(/Ramp · New York, NY · onsite · full-time/)).toBeInTheDocument()
+    // The single run-on meta line became a company/source line plus a labelled fact
+    // grid, so each fact is asserted where it actually lives.
+    expect(screen.getByText('Ramp')).toBeInTheDocument()
+    expect(screen.getByText('New York, NY')).toBeInTheDocument()
     expect(screen.getByText('$120k–150k')).toBeInTheDocument()
     expect(screen.getByText('caught 4 min')).toBeInTheDocument()
   })
 
   it('badges the company funding stage', () => {
     render(<JobCard posting={posting} />)
-    expect(screen.getByText('series A')).toBeInTheDocument()
+    expect(screen.getByText('Series A')).toBeInTheDocument()
   })
 
   it('shows no stage badge when the stage is unknown or absent', () => {
@@ -53,8 +57,10 @@ describe('JobCard', () => {
   it('fires onState for save / applied / hide', () => {
     const onState = vi.fn()
     render(<JobCard posting={posting} onState={onState} />)
-    fireEvent.click(screen.getByText('save'))
-    fireEvent.click(screen.getByText('applied'))
+    // Save and hide are icon buttons now and carry their names as aria-labels; "mark
+    // applied" is still a labelled button.
+    fireEvent.click(screen.getByLabelText(/save this posting/i))
+    fireEvent.click(screen.getByText(/mark applied/i))
     fireEvent.click(screen.getByLabelText(/hide this posting/i))
     expect(onState).toHaveBeenNthCalledWith(1, 'SAVED')
     expect(onState).toHaveBeenNthCalledWith(2, 'APPLIED')

@@ -72,6 +72,13 @@ class PostingRepositoryAdapter implements PostingRepository {
     }
 
     @Override
+    public List<Posting> findCaughtSince(java.time.Instant since) {
+        return jdbc.findCaughtSince(since).stream()
+                .map(PostingRepositoryAdapter::toDomain)
+                .toList();
+    }
+
+    @Override
     public int deleteStalePostedBefore(java.time.Instant cutoff) {
         return jdbc.deleteStalePostedBefore(cutoff);
     }

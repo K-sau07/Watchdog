@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
-import { AgentStatusBar } from './AgentStatusBar'
+import { AgentPanel } from './AgentPanel'
 import type { AgentStatus } from '../../lib/api'
 
 const NOW = Date.parse('2026-09-08T12:00:00Z')
@@ -14,6 +14,7 @@ const status: AgentStatus = {
   nextPoll: '2026-09-08T12:01:22Z',
   newToday: 12,
   medianCatchMinutesToday: 6,
+  caughtToday: 9,
 }
 
 const baseProps = {
@@ -23,38 +24,43 @@ const baseProps = {
   cooldownSeconds: null,
 }
 
-describe('AgentStatusBar', () => {
+describe('AgentPanel', () => {
   it('shows boards watched, poll timing, and new-today when live', () => {
-    render(<AgentStatusBar {...baseProps} status={status} isError={false} />)
+    render(<AgentPanel {...baseProps} status={status} isError={false} />)
     expect(screen.getByText(/watching · 25 boards/i)).toBeInTheDocument()
-    expect(screen.getByText(/last poll 38s ago/i)).toBeInTheDocument()
-    expect(screen.getByText(/next in 1:22/i)).toBeInTheDocument()
-    expect(screen.getByText(/12 new today/i)).toBeInTheDocument()
+    // The readouts are a definition list now, so each term and its value are separate
+    // nodes rather than one run-on string.
+    expect(screen.getByText('last poll')).toBeInTheDocument()
+    expect(screen.getByText(/38s ago/i)).toBeInTheDocument()
+    expect(screen.getByText('next poll')).toBeInTheDocument()
+    expect(screen.getByText(/1:22/)).toBeInTheDocument()
+    expect(screen.getByText('new today')).toBeInTheDocument()
+    expect(screen.getByText('12')).toBeInTheDocument()
   })
 
   it('degrades honestly when the agent is unreachable', () => {
-    render(<AgentStatusBar {...baseProps} status={undefined} isError />)
+    render(<AgentPanel {...baseProps} status={undefined} isError />)
     expect(screen.getByText(/agent unreachable/i)).toBeInTheDocument()
     expect(screen.queryByText(/boards/i)).not.toBeInTheDocument()
   })
 
   it('shows a connecting state before the first load', () => {
-    render(<AgentStatusBar {...baseProps} status={undefined} isError={false} />)
+    render(<AgentPanel {...baseProps} status={undefined} isError={false} />)
     expect(screen.getByText(/connecting/i)).toBeInTheDocument()
   })
 
   it('fires refresh and shows cooldown/refreshing states', () => {
     const onRefresh = vi.fn()
     const { rerender } = render(
-      <AgentStatusBar {...baseProps} status={status} isError={false} onRefresh={onRefresh} />,
+      <AgentPanel {...baseProps} status={status} isError={false} onRefresh={onRefresh} />,
     )
     fireEvent.click(screen.getByText(/↻ refresh/i))
     expect(onRefresh).toHaveBeenCalledOnce()
 
-    rerender(<AgentStatusBar {...baseProps} status={status} isError={false} isRefreshing />)
+    rerender(<AgentPanel {...baseProps} status={status} isError={false} isRefreshing />)
     expect(screen.getByText(/refreshing/i)).toBeInTheDocument()
 
-    rerender(<AgentStatusBar {...baseProps} status={status} isError={false} cooldownSeconds={45} />)
+    rerender(<AgentPanel {...baseProps} status={status} isError={false} cooldownSeconds={45} />)
     expect(screen.getByText(/wait 45s/i)).toBeInTheDocument()
   })
 })

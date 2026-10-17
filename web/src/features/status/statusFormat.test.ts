@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { agoLabel, countdownLabel, medianLabel, hasEarlyAdvantage } from './statusFormat'
+import { agoLabel, countdownLabel, medianLabel, hasEarlyAdvantage, heroStat } from './statusFormat'
 
 const NOW = Date.parse('2026-09-08T12:00:00Z')
 
@@ -51,5 +51,39 @@ describe('hasEarlyAdvantage', () => {
     // the value that shipped the false claim: 13100 min is nine days
     expect(hasEarlyAdvantage(13100)).toBe(false)
     expect(hasEarlyAdvantage(null)).toBe(false)
+  })
+})
+
+describe('heroStat', () => {
+  it('leads with catch time when something was genuinely caught', () => {
+    const h = heroStat(6, 9, 120)
+    expect(h.big).toBe('6 min')
+    expect(h.label).toMatch(/median catch time/i)
+    expect(h.note).toBeNull()
+  })
+
+  it('refuses to headline a median when nothing was caught today', () => {
+    // All backfill: 3193 rows written, none of them posted while we were watching. The
+    // old behaviour put "88 days" in the largest type on the page.
+    const h = heroStat(127936, 0, 3193)
+    expect(h.big).toBe('3,193')
+    expect(h.label).toMatch(/postings found today/i)
+    expect(h.note).toMatch(/already watching/i)
+  })
+
+  it('falls back the same way when the median is simply unknown', () => {
+    const h = heroStat(null, 0, 12)
+    expect(h.big).toBe('12')
+    expect(h.note).not.toBeNull()
+  })
+
+  it('says nothing extra on a genuinely empty day', () => {
+    const h = heroStat(null, 0, 0)
+    expect(h.big).toBe('0')
+    expect(h.note).toBeNull()
+  })
+
+  it('singularises one posting', () => {
+    expect(heroStat(null, 0, 1).label).toBe('posting found today')
   })
 })

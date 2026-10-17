@@ -48,6 +48,18 @@ public interface PostingRepository {
     List<Posting> findSeenSince(java.time.Instant since);
 
     /**
+     * Postings first seen at/after {@code since} that were genuinely <em>caught</em> —
+     * posted after we began watching their board.
+     *
+     * <p>Distinct from {@link #findSeenSince} on purpose. That returns everything the
+     * poller wrote today, backfill included; a board's first poll imports roles the ATS
+     * published long before Watchdog existed, and their catch-time is meaningless. Only
+     * these rows may be used for catch-time statistics. A board with no recorded start
+     * contributes nothing rather than contributing a guess.
+     */
+    List<Posting> findCaughtSince(java.time.Instant since);
+
+    /**
      * Delete postings posted before {@code cutoff} that no user has acted on — i.e. that
      * have no {@code job_state} row (D-WD18: protect saved/applied/hidden). Returns the
      * number deleted. Keeps the DB fresh without losing anything the user chose to track.

@@ -57,6 +57,18 @@ class AgentStatusServiceTest {
         @Override public List<Posting> findSeenSince(Instant since) {
             return store.stream().filter(p -> !p.firstSeenAt().isBefore(since)).toList();
         }
+        /**
+         * The fake has no company table to join, so "genuinely caught" is modelled as
+         * "has a known postedAt" — which is what these tests set up. The production
+         * query additionally requires posted_at >= company.first_polled_at; that extra
+         * clause is exercised against a real database in the Testcontainers suite.
+         */
+        @Override public List<Posting> findCaughtSince(Instant since) {
+            return store.stream()
+                    .filter(p -> !p.firstSeenAt().isBefore(since))
+                    .filter(p -> p.postedAt() != null)
+                    .toList();
+        }
         @Override public int deleteStalePostedBefore(Instant cutoff) { return 0; }
     }
 
