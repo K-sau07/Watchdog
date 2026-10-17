@@ -169,6 +169,56 @@ Branch `s9-verify`, merged to `main --no-ff`. Booted the full stack (backend on 
 - **Honest limitations carried to Phase 2 (documented, not hidden):** cold-start catch-time is huge on a board's first poll (honest, expected); registry is 25 verified boards (grows to 500 by appending verified rows — data task); rate-limit/stagger tuning across many boards deferred; notifications + native-Mac alerts + real auth are all Phase 2 by design (spec §1).
 - **v1 acceptance: MET.** The agent polls real ATS boards on a 2-min schedule (ShedLock/Redis, resilient), dedups exactly-once, persists, computes honest catch-time, and the cyber dashboard surfaces filtered results newest-first with the live "caught N min" signature stat, working job-state workflow, and real agent-status — all against the live stack.
 
+### 2026-10-17 — Session 11: Jobright-shaped shell, honest catch-time, the outreach layer
+Three things, in the order they blocked each other. Backend **262 tests** green (`mvn clean verify`), frontend gauntlet green — typecheck + oxlint 0/0 + **92 tests** + build.
+
+**1. The shell, rebuilt against the reference product.** Captured the live reference with REA (five tabs over CDP) and measured the design system out of its CSS rather than eyeballing it — the palette was already swapped in a previous session; this session moved the *structure*.
+- `shell/AppShell.tsx` — left rail (Jobs / Started / Applied / Agent, Settings pinned), `JOBS ›` breadcrumb, Feed/Started/Applied tabs, right-hand panel. Rail becomes a bottom bar under 768px. Routing via react-router-dom (added but unused since the last session).
+- `filters/FilterBar.tsx` — the 280px rail is now horizontal pills, each folding its own selection into its label ("series A +1"), closing on outside-click and Escape.
+- **FilterRail was not deleted.** It moved behind `••• All filters` as a slide-over. Deleting it would have silently dropped seven dimensions pills can't hold — free-text roles, keywords, exclusions, locations, salary floor.
+- `AgentStatusBar` → `AgentPanel`: the agent moved out of a top bar into the side panel, because the top strip is navigation now. Same DB-derived numbers.
+- Fixed 7 references to tokens that no longer exist (`bg-void`, `text-amber`, `border-amber`, `font-voice`, `bg-card-hover`, `--amber-glow`). They were rendering as nothing.
+- Deliberately absent: Resume, Coaching, Interview. The reference has all three; we have no data behind any of them, and a tab that can only render an empty state is worse than no tab.
+
+**2. The signature stat was lying.** The hero read **88 days**. `caught = first_seen_at − posted_at`, and on a board's first poll the ATS published those roles long before we existed — with 364 mostly-backfilled boards the median was arithmetically correct and told the reader the opposite of the truth.
+- **V4** adds `company.first_polled_at`, backfilled as `MIN(posting.first_seen_at)` per board — an estimate that can never be *later* than the true start, so it never counts backfill as a catch. Stamped once on first poll via `stampFirstPolledIfAbsent` (the `IS NULL` guard is the contract; kept out of `CompanyRow` on purpose, since a mapped column would be rewritten on every save).
+- `PostingRepository.findCaughtSince` is separate from `findSeenSince` because they answer different questions. `newToday` counts work done (backfill included); `caughtToday` counts the population the median describes. Both are on the status DTO so the client can't conflate them.
+- The fix was **not** to drop outliers — that would be inventing a cleaner story than the data supports.
+- `heroStat()` refuses to headline a median when nothing was genuinely caught, falling back to postings-found-today with a note saying why catch-time is missing.
+- Result: 127,936 min → 5,648 min. **Still not "minutes", and that is a real finding, not a maths problem** — see the operational note below.
+
+**3. The outreach layer (D-WD24).** Watchdog is the top of an outreach funnel: find the startup → pick it → reach out → track it.
+- **V5** adds `contact`. `STAGES.md` deliberately tracks nobody until they reply ("No rows for invites. No rows for accepts. LinkedIn holds all of that already"). That refusal was earned — a hand-maintained parallel copy produced forty-five stale rows last time. This table is allowed on different terms: written once, by the app, at send time, from the posting that prompted it. Nothing is re-typed. It still refuses to track whether they *accepted* — there is no column for it.
+- Domain: `Contact`, `OutreachStage`, `CanGive`. The cap lives in the model where nothing can route around it — two unanswered in a row → NURTURE, a reply resets the counter to zero, a live conversation has no ceiling. ASKED/WON/DEAD never get dragged backwards by a late reply. 10 domain tests.
+- `GET/POST/PATCH /api/outreach`; board grouped by company (one registry pass, not one lookup per group). Verified live: the cap fires on a second unanswered approach, bad enum → 400, unknown id → 404.
+- Frontend: `outreachFormat.ts` (owes-whom rules straight from STAGES.md, 10 tests), company-grouped Started board, and `reach out` on every job card.
+- `contact.posting_id` is `ON DELETE SET NULL` — retention prunes postings (D-WD18) and losing a job ad must never delete the record of a conversation.
+
+**Decisions:** **D-WD24** = the app owns the reach-out layer (stamped at send time), the vault keeps everything from LIVE onward. **D-WD25** = catch-time statistics are computed only over postings posted after their board's first poll.
+
+**⚠ Operational finding — the agent is not actually watching.** Every one of today's 3,193 postings was first seen inside a *single hour*, and the poll interval is now 1 hour. The minimum catch-time among genuine catches is 802 minutes. The product's claim is "minutes after they go live"; delivering it needs the poller running continuously, and it currently runs only while someone has the app up. Render's free tier sleeps after ~15 min idle (README says so). **The remaining 3-day median is an honest report of intermittent polling, not a display bug — do not "fix" it in the formatter.**
+
+**Carried, not done:** the Started board has no way to record a *reply* from the UI yet (the endpoint exists; `recordReply` is unused). `postingTitle` is always null on the contact DTO — a contact outlives the ad, so the board is built to read correctly without it rather than joining a row that may be gone.
+
+### 2026-10-17 — Session 12: the outreach middle (D-WD26, D-WD27)
+Backend **273 tests** green (`mvn clean verify`), frontend gauntlet green — typecheck + oxlint 0/0 + **95 tests** + build. Verified end to end against the live stack and screenshotted.
+
+**The shape of the work, as stated:** 20 companies a week, 8 people each — 160 invites against a 200 ceiling, stop when they burn. Every one of the 8 gets *both* channels, LinkedIn and email; email coverage is partial by nature because an address can't always be found. Started splits per company into people who haven't written back and people mid-conversation. The app drafts, Saurabh sends, on both channels (`Pipeline/CLAUDE.md`: cockpit not autopilot).
+
+**Two rules changed, both deliberately.**
+- **D-WD27 — an invite is not a message.** `STAGES.md` says it outright: *"An invite note is not a message. It is an invite. The counter starts after the accept."* S11's `Contact.reachOut` set `unanswered = 1` at reach-out, so a LinkedIn invite burned half the cap before anything was said. `Channel.LINKEDIN_INVITE` is now its own channel and `countsAsMessage()` returns false for it. An unanswered invite is chased with a **DM**, not a second invite — LinkedIn doesn't allow one, and they may simply not have accepted.
+- **D-WD26 — the unanswered cap is per channel, not per person.** Two channels against a 2-per-person cap meant a person hit on LinkedIn *and* email was at the cap before either channel got a follow-up, which defeats the point of two channels. Cap is now 2 per channel; a person is NURTURE only when **every** channel is spent. This is a real extension of STAGES.md, not an implementation detail.
+
+**Events are the truth; the counters are projections.** `contact.stage`, `turns` and `unanswered` were stored *and* held in `Pipeline/people/*.md` frontmatter — two copies of one fact, which is exactly what produced forty-five stale rows in the system the vault replaced. **V6 drops all three columns.** New `outreach_event` table (append-only: direction, channel, kind, status, body) is the only thing written; `OutreachProjection` derives stage, turns, unanswered, channels touched and follow-up-due from it. The cap logic that lived on the `Contact` record is gone from there — having it in a record *and* a projection would have been the same duplication one layer up. `Contact` is now identity and routing only, plus `stage_override` for the four stages a human declares (ASKED/WON/DEAD/NURTURE) because no event says "they sounded irritated".
+
+**The 2-day clock.** `FOLLOW_UP_AFTER = 2 days` from the last *sent* outbound, with nothing due while the ball is theirs — a chase and an answer are different obligations and the board must not blur them. When several channels qualify the coldest wins. A DRAFTED event spends nothing and starts no clock: written but not sent has reached nobody.
+
+**Frontend.** Started rebuilt: follow-up queue pinned above everything (a chase that needs scrolling to find doesn't get sent), then per company a coverage header (`3 of 8 targeted · 3 on linkedin · 2 emailed`) over two groups. Channel chips (`in` / `email`) per person are the "are we done emailing these people" readout. `PacePanel` in the right rail shows invites against the 200 cap and goes red when burned. `ReachOutButton` gained email and person-type fields; `person_type` uses the same five values as the vault's `_TEMPLATE.md` `type` field so the two never drift into separate vocabularies.
+
+**Verified live:** 3-day-old invite surfaced a chase on LINKEDIN_DM; DM follow-up took unanswered to 1; an email on top gave `{LINKEDIN_DM: 1, EMAIL: 1}` rather than tipping to NURTURE (D-WD26 working); a reply reset to 0 and moved the row to LIVE with nothing due.
+
+**Carried:** the follow-up queue repeats rows that also appear in their company block — fine at 160 people, repetitive at 5. Drafts are stored on events but nothing surfaces or composes them yet; the `/invite` and `/open` skills still draft outside the app. No import path for purchased email addresses — they go in one at a time through the dialog.
+
 ---
 
 ## Environment gotchas (append as discovered)
