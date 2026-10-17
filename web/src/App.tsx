@@ -85,7 +85,10 @@ function App() {
 
         {/* Mobile: slide-in drawer over a scrim. */}
         {railOpen ? (
-          <div className="fixed inset-0 z-20 md:hidden">
+          /* Above the status bar (z-30), not under it — the drawer's own header carries
+             the close button, and at z-20 the bar covered it, leaving the scrim as the
+             only way out. */
+          <div className="fixed inset-0 z-40 md:hidden">
             <div
               className="absolute inset-0 bg-black/60"
               onClick={() => setRailOpen(false)}
@@ -103,7 +106,12 @@ function App() {
                   ✕
                 </button>
               </div>
-              <FilterRail value={filter} onChange={setFilter} onReset={resetFilters} />
+              <FilterRail
+                value={filter}
+                onChange={setFilter}
+                onReset={resetFilters}
+                showHeading={false}
+              />
             </div>
           </div>
         ) : null}

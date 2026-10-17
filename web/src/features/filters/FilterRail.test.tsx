@@ -16,7 +16,7 @@ describe('FilterRail', () => {
   it('adds a role tag on Enter', () => {
     const onChange = vi.fn()
     render(<FilterRail value={EMPTY_FILTER} onChange={onChange} onReset={() => {}} />)
-    const input = screen.getByLabelText('role')
+    const input = screen.getByLabelText('job title')
     fireEvent.change(input, { target: { value: 'new grad' } })
     fireEvent.keyDown(input, { key: 'Enter' })
     expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ roles: ['new grad'] }))
@@ -46,5 +46,27 @@ describe('FilterRail', () => {
   it('has no reset control when nothing is active', () => {
     render(<FilterRail value={EMPTY_FILTER} onChange={() => {}} onReset={() => {}} />)
     expect(screen.queryByText(/reset/)).not.toBeInTheDocument()
+  })
+
+  it('renders its own heading by default', () => {
+    render(<FilterRail value={EMPTY_FILTER} onChange={vi.fn()} onReset={vi.fn()} />)
+    expect(screen.getByRole('heading', { name: 'filters' })).toBeInTheDocument()
+  })
+
+  it('drops the heading inside the drawer, which supplies its own', () => {
+    const active = { ...EMPTY_FILTER, usOnly: true }
+    render(
+      <FilterRail value={active} onChange={vi.fn()} onReset={vi.fn()} showHeading={false} />,
+    )
+    expect(screen.queryByRole('heading', { name: 'filters' })).not.toBeInTheDocument()
+    // the reset control belongs to the filter state, so it survives
+    expect(screen.getByText(/reset \(1\)/)).toBeInTheDocument()
+  })
+
+  it('offers the company-stage and role-type dimensions', () => {
+    render(<FilterRail value={EMPTY_FILTER} onChange={vi.fn()} onReset={vi.fn()} />)
+    expect(screen.getByText('company stage')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'series B+' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'individual contributor' })).toBeInTheDocument()
   })
 })

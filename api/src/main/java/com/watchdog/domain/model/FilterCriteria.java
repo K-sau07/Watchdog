@@ -37,6 +37,8 @@ public record FilterCriteria(
         SponsorshipPref sponsorshipPref,  // ANY = no constraint
         Set<AtsSource> sources,           // empty = any
         Set<FundingStage> fundingStages,  // empty = any; a Company attribute (see note)
+        Set<RoleType> roleTypes,          // empty = any; inferred from the title
+        List<String> excludeCompanies,    // none-match against the company name
         Set<JobState> statesToShow,       // empty = any (feed usually hides HIDDEN)
         java.time.Duration postedWithin,  // null = no relative window
         Instant seenFrom,                 // null = no lower bound
@@ -74,6 +76,8 @@ public record FilterCriteria(
         private SponsorshipPref sponsorshipPref = SponsorshipPref.ANY;
         private Set<AtsSource> sources = Set.of();
         private Set<FundingStage> fundingStages = Set.of();
+        private Set<RoleType> roleTypes = Set.of();
+        private List<String> excludeCompanies = List.of();
         private Set<JobState> statesToShow = Set.of();
         private java.time.Duration postedWithin = null;
         private Instant seenFrom = null;
@@ -81,6 +85,8 @@ public record FilterCriteria(
         private boolean usOnly = false;
 
         public Builder fundingStages(Set<FundingStage> v) { this.fundingStages = safeSet(v); return this; }
+        public Builder roleTypes(Set<RoleType> v) { this.roleTypes = safeSet(v); return this; }
+        public Builder excludeCompanies(List<String> v) { this.excludeCompanies = safe(v); return this; }
         public Builder roleKeywords(List<String> v) { this.roleKeywords = safe(v); return this; }
         public Builder includeKeywords(List<String> v) { this.includeKeywords = safe(v); return this; }
         public Builder excludeKeywords(List<String> v) { this.excludeKeywords = safe(v); return this; }
@@ -102,7 +108,8 @@ public record FilterCriteria(
             return new FilterCriteria(
                     roleKeywords, includeKeywords, excludeKeywords, seniorities, remoteTypes,
                     locations, employmentTypes, salaryMin, includeUnknownSalary, sponsorshipPref,
-                    sources, fundingStages, statesToShow, postedWithin, seenFrom, seenTo, usOnly);
+                    sources, fundingStages, roleTypes, excludeCompanies, statesToShow,
+                    postedWithin, seenFrom, seenTo, usOnly);
         }
 
         private static List<String> safe(List<String> v) { return v == null ? List.of() : List.copyOf(v); }

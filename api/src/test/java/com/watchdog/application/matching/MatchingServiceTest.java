@@ -13,6 +13,7 @@ import com.watchdog.domain.model.StageSource;
 import com.watchdog.domain.model.JobStateRecord;
 import com.watchdog.domain.model.Posting;
 import com.watchdog.domain.model.RemoteType;
+import com.watchdog.domain.model.RoleType;
 import com.watchdog.domain.model.Salary;
 import com.watchdog.domain.model.Seniority;
 import com.watchdog.domain.model.SponsorshipSignal;
@@ -312,5 +313,35 @@ class MatchingServiceTest {
         posting(late, "Backend Engineer", "d", NOW, Salary.empty(), SponsorshipSignal.UNKNOWN);
 
         assertThat(service().search(FilterCriteria.all(), 0, 10).totalMatched()).isEqualTo(1);
+    }
+
+    @Test
+    void filtersOutManagementRolesWhenIcIsRequested() {
+        Company gh = company(AtsSource.GREENHOUSE);
+        posting(gh, "Senior Backend Engineer", "d", NOW, Salary.empty(), SponsorshipSignal.UNKNOWN);
+        posting(gh, "Engineering Manager", "d", NOW, Salary.empty(), SponsorshipSignal.UNKNOWN);
+        // A PM is an IC despite the title — it must survive the filter.
+        posting(gh, "Senior Product Manager", "d", NOW, Salary.empty(), SponsorshipSignal.UNKNOWN);
+
+        FilterCriteria icOnly = FilterCriteria.builder().roleTypes(Set.of(RoleType.IC)).build();
+        MatchingService.Page page = service().search(icOnly, 0, 10);
+
+        assertThat(page.items()).extracting(m -> m.posting().title())
+                .containsExactlyInAnyOrder("Senior Backend Engineer", "Senior Product Manager");
+    }
+
+    @Test
+    void excludesCompaniesByNameSubstring() {
+        Company ok = company("Kombo", FundingStage.SERIES_A);
+        Company blocked = company("Amazon Web Services", FundingStage.GROWTH);
+        posting(ok, "Backend Engineer", "d", NOW, Salary.empty(), SponsorshipSignal.UNKNOWN);
+        posting(blocked, "Backend Engineer", "d", NOW, Salary.empty(), SponsorshipSignal.UNKNOWN);
+
+        FilterCriteria noAmazon = FilterCriteria.builder()
+                .excludeCompanies(List.of("amazon")).build();
+        MatchingService.Page page = service().search(noAmazon, 0, 10);
+
+        assertThat(page.totalMatched()).isEqualTo(1);
+        assertThat(page.items().get(0).companyName()).isEqualTo("Kombo");
     }
 }

@@ -9,6 +9,7 @@ import com.watchdog.domain.model.FundingStage;
 import com.watchdog.domain.model.JobState;
 import com.watchdog.domain.model.Posting;
 import com.watchdog.domain.model.PostingMatcher;
+import com.watchdog.domain.model.RoleTypeParser;
 import com.watchdog.domain.model.Salary;
 import com.watchdog.domain.model.SalaryParser;
 import com.watchdog.domain.model.Seniority;
@@ -55,8 +56,21 @@ import java.util.stream.Collectors;
 @Service
 public class MatchingService {
 
-    /** Candidate window cap (D-WD10). Ample at v1 volume; revisit via measurement. */
-    static final int CANDIDATE_LIMIT = 2000;
+    /**
+     * Candidate window cap (D-WD10): the feed matches against the newest N postings rather
+     * than the whole table.
+     *
+     * <p>The measurement the original note asked for has now happened. At 364 boards a
+     * single poll cycle produced 3,117 new postings — more than the old 2,000 window — so
+     * one poll could push every earlier posting out of range and a filter would quietly
+     * search a truncated corpus. 10,000 covers current volume with room to grow.
+     *
+     * <p>This is a stopgap, not the answer. The window exists because matching happens in
+     * memory; the real fix is pushing the filter into SQL so the cap stops mattering. Until
+     * then, totalMatched is bounded by this number and should be read as "within the newest
+     * {@value} postings".
+     */
+    static final int CANDIDATE_LIMIT = 10_000;
 
     /**
      * Enrichment cache (D-WD10 follow-up). {@link #enrich} runs three regex parsers over the
@@ -179,6 +193,8 @@ public class MatchingService {
                 && matchesSeniority(m.seniority(), criteria)
                 && matchesSource(p.companyId(), criteria, companyById)
                 && matchesFundingStage(p.companyId(), criteria, companyById)
+                && matchesRoleType(p.title(), criteria)
+                && matchesExcludedCompany(p.companyId(), criteria, companyById)
                 && matchesState(p, criteria);
     }
 
@@ -209,6 +225,30 @@ public class MatchingService {
         if (criteria.fundingStages().isEmpty()) return true;
         Company company = companyById.get(companyId);
         return company != null && criteria.fundingStages().contains(company.fundingStage());
+    }
+
+    /**
+     * IC-vs-manager filter. Title-derived like seniority, so it resolves here rather than
+     * in {@link PostingMatcher}, next to the parser that answers it.
+     */
+    private static boolean matchesRoleType(String title, FilterCriteria criteria) {
+        if (criteria.roleTypes().isEmpty()) return true;
+        return criteria.roleTypes().contains(RoleTypeParser.parse(title));
+    }
+
+    /**
+     * Company blocklist. Matched case-insensitively as a substring of the company name, so
+     * "amazon" also drops "Amazon Web Services" — a blocklist that needed the legal name
+     * typed exactly would not be worth having.
+     */
+    private static boolean matchesExcludedCompany(CompanyId companyId, FilterCriteria criteria,
+                                                  Map<CompanyId, Company> companyById) {
+        if (criteria.excludeCompanies().isEmpty()) return true;
+        Company company = companyById.get(companyId);
+        if (company == null) return true;
+        String name = company.name().toLowerCase(java.util.Locale.ROOT);
+        return criteria.excludeCompanies().stream()
+                .noneMatch(x -> name.contains(x.toLowerCase(java.util.Locale.ROOT)));
     }
 
     /**

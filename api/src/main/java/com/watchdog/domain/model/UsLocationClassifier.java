@@ -67,7 +67,19 @@ public final class UsLocationClassifier {
                     + "vietnam|hanoi|indonesia|jakarta|thailand|bangkok|malaysia|korea|seoul|"
                     + "china|beijing|shanghai|hong kong|taiwan|emea|apac|latam|europe|"
                     + "costa rica|colombia|chile|peru|uruguay|egypt|morocco|nigeria|ghana|"
-                    + "kenya|south africa|turkey|ukraine)\\b",
+                    + "kenya|south africa|turkey|ukraine|"
+                    // Added after a live audit of the feed surfaced a Kosovo role passing
+                    // the "United States only" filter. Deliberately excludes country names
+                    // that collide with US states (Georgia): US signals are checked first,
+                    // so listing them here would be dead weight at best.
+                    + "kosovo|pristina|albania|tirana|bosnia|herzegovina|sarajevo|"
+                    + "north macedonia|macedonia|skopje|montenegro|podgorica|moldova|"
+                    + "chisinau|belarus|minsk|armenia|yerevan|azerbaijan|baku|kazakhstan|"
+                    + "almaty|uzbekistan|tashkent|pakistan|karachi|lahore|islamabad|"
+                    + "bangladesh|dhaka|sri lanka|colombo|nepal|kathmandu|cambodia|"
+                    + "phnom penh|myanmar|ecuador|bolivia|paraguay|venezuela|panama|"
+                    + "guatemala|dominican republic|tunisia|algeria|ethiopia|tanzania|"
+                    + "uganda|rwanda|kigali|senegal|zimbabwe|zambia|mozambique|angola)\\b",
             Pattern.CASE_INSENSITIVE);
 
     /** True if the location should pass a "United States only" filter (inclusive). */

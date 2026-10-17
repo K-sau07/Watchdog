@@ -6,6 +6,7 @@ import com.watchdog.domain.model.FilterCriteria;
 import com.watchdog.domain.model.FundingStage;
 import com.watchdog.domain.model.JobState;
 import com.watchdog.domain.model.RemoteType;
+import com.watchdog.domain.model.RoleType;
 import com.watchdog.domain.model.Seniority;
 
 import java.math.BigDecimal;
@@ -51,6 +52,8 @@ final class PostingQueryMapper {
                 .employmentTypes(parseEnumSet(p.employmentType(), EmploymentType.class, "employmentType"))
                 .sources(parseEnumSet(p.source(), AtsSource.class, "source"))
                 .fundingStages(parseEnumSet(p.stage(), FundingStage.class, "stage"))
+                .roleTypes(parseEnumSet(p.roleType(), RoleType.class, "roleType"))
+                .excludeCompanies(splitList(p.excludeCompanies()))
                 .statesToShow(parseEnumSet(p.state(), JobState.class, "state"));
 
         if (p.salaryMin() != null) {
@@ -125,8 +128,10 @@ final class PostingQueryMapper {
 
     /**
      * Friendly relative-window tokens (spec §5 "posted within"): 10m / 30m / 1h / today /
-     * week. "today" and "week" are approximated as 24h / 7d rolling windows — honest and
-     * simple for v1; a calendar-day variant can come later if measurement warrants.
+     * 3d / week / month. The sub-hour windows are what this tool is for; 3d and month
+     * exist because a feed with nothing in the last hour still needs a usable widening
+     * step. All are rolling durations rather than calendar days — honest and simple for
+     * v1; a calendar-day variant can come later if measurement warrants.
      */
     private static Duration parsePostedWithin(String raw) {
         String t = raw.trim().toLowerCase(Locale.ROOT);
@@ -135,9 +140,11 @@ final class PostingQueryMapper {
             case "30m" -> Duration.ofMinutes(30);
             case "1h" -> Duration.ofHours(1);
             case "today" -> Duration.ofHours(24);
+            case "3d" -> Duration.ofDays(3);
             case "week" -> Duration.ofDays(7);
+            case "month" -> Duration.ofDays(30);
             default -> throw new BadFilterParam(
-                    "invalid postedWithin (expected 10m|30m|1h|today|week): '" + raw + "'");
+                    "invalid postedWithin (expected 10m|30m|1h|today|3d|week|month): '" + raw + "'");
         };
     }
 }

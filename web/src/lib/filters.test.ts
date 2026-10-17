@@ -63,6 +63,31 @@ describe('stage dimension', () => {
   })
 })
 
+describe('role type and company exclusions', () => {
+  it('sends roleType as a single value, not a list', () => {
+    const qs = new URLSearchParams(toQueryString({ ...EMPTY_FILTER, roleType: 'IC' }))
+    expect(qs.get('roleType')).toBe('IC')
+  })
+
+  it('comma-joins excluded companies', () => {
+    const qs = new URLSearchParams(
+      toQueryString({ ...EMPTY_FILTER, excludeCompanies: ['amazon', 'oracle'] }),
+    )
+    expect(qs.get('excludeCompanies')).toBe('amazon,oracle')
+  })
+
+  it('omits both when unset', () => {
+    const qs = new URLSearchParams(toQueryString(EMPTY_FILTER))
+    expect(qs.has('roleType')).toBe(false)
+    expect(qs.has('excludeCompanies')).toBe(false)
+  })
+
+  it('each counts as one active dimension', () => {
+    expect(activeCount({ ...EMPTY_FILTER, roleType: 'MANAGER' })).toBe(1)
+    expect(activeCount({ ...EMPTY_FILTER, excludeCompanies: ['amazon'] })).toBe(1)
+  })
+})
+
 describe('activeCount', () => {
   it('is zero for the empty filter', () => {
     expect(activeCount(EMPTY_FILTER)).toBe(0)

@@ -1,6 +1,8 @@
 package com.watchdog.domain.model;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -85,5 +87,29 @@ class UsLocationClassifierTest {
         assertThat(UsLocationClassifier.isUnitedStates("Distributed")).isTrue();
         assertThat(UsLocationClassifier.isUnitedStates(null)).isTrue();
         assertThat(UsLocationClassifier.isUnitedStates("")).isTrue();
+    }
+
+    /**
+     * Found by auditing the live feed: a Kosovo role was passing "United States only".
+     * The classifier is inclusive by design, but a named country is not ambiguous.
+     */
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "Kosovo",
+            "Pristina, Kosovo",
+            "Remote - Albania",
+            "Sarajevo, Bosnia and Herzegovina",
+            "Karachi, Pakistan",
+            "Dhaka, Bangladesh",
+            "Kigali, Rwanda",
+    })
+    void countriesFoundMissingInALiveAudit(String location) {
+        assertThat(UsLocationClassifier.isUnitedStates(location)).isFalse();
+    }
+
+    /** Georgia is a US state as well as a country; the US check must keep winning. */
+    @Test
+    void georgiaStaysUnitedStates() {
+        assertThat(UsLocationClassifier.isUnitedStates("Atlanta, Georgia")).isTrue();
     }
 }

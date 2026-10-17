@@ -7,18 +7,28 @@ describe('formatSalary', () => {
     expect(formatSalary({ min: 120000, max: 150000, currency: 'USD' })).toBe('$120k–150k')
   })
   it('formats min-only and max-only', () => {
-    expect(formatSalary({ min: 120000, max: null, currency: null })).toBe('$120k+')
-    expect(formatSalary({ min: null, max: 150000, currency: null })).toBe('up to $150k')
+    expect(formatSalary({ min: 120000, max: null, currency: 'USD' })).toBe('$120k+')
+    expect(formatSalary({ min: null, max: 150000, currency: 'USD' })).toBe('up to $150k')
   })
-  it('shows non-USD currency', () => {
-    expect(formatSalary({ min: 110000, max: 145000, currency: 'CAD' })).toBe('$110k–145k CAD')
+  it('uses the right symbol per currency, never a dollar sign with a foreign code', () => {
+    expect(formatSalary({ min: 110000, max: 145000, currency: 'CAD' })).toBe('CA$110k–145k')
+    expect(formatSalary({ min: 60000, max: 120000, currency: 'EUR' })).toBe('€60k–120k')
+    expect(formatSalary({ min: 70000, max: 90000, currency: 'GBP' })).toBe('£70k–90k')
+    expect(formatSalary({ min: 70000, max: 90000, currency: 'SEK' })).toBe('SEK 70k–90k')
   })
   it('keeps one decimal for non-round k', () => {
-    expect(formatSalary({ min: 92500, max: null, currency: null })).toBe('$92.5k+')
+    expect(formatSalary({ min: 92500, max: null, currency: 'USD' })).toBe('$92.5k+')
   })
   it('is null when empty', () => {
     expect(formatSalary(null)).toBeNull()
     expect(formatSalary({ min: null, max: null, currency: null })).toBeNull()
+  })
+
+  it('claims no currency when the parser never saw one', () => {
+    // These rows come from the heuristic description parser, which reads numbers out of
+    // prose and has no currency to report. A "$" here would be an invention.
+    expect(formatSalary({ min: 3000, max: 200000, currency: null })).toBe('3k–200k')
+    expect(formatSalary({ min: 120000, max: null, currency: null })).toBe('120k+')
   })
 })
 
